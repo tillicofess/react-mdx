@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 import MDXRenderer from "./components/MDXRenderer";
 import MDXFileSelector from "./components/MDXFileSelector";
 import { loadMDXFile, parseFrontmatter } from "./utils/mdxLoader";

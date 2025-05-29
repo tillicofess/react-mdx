@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { evaluate } from "@mdx-js/mdx";
+import remarkGfm from 'remark-gfm';
 import rehypePrettyCode from "rehype-pretty-code";
 import { MDXProvider } from "@mdx-js/react";
 import * as runtime from "react/jsx-runtime";
 import * as provider from "@mdx-js/react";
 import { components } from "./MdxComponents";
 import type { Element } from "hast";
+import { Prose } from "@/components/ui/typography";
 
 interface MDXRendererProps {
   mdxContent: string;
@@ -28,12 +30,14 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
         const { default: Component } = await evaluate(mdxContent, {
           ...provider,
           ...runtime,
+          remarkPlugins: [remarkGfm],
           // 添加 data-language
           rehypePlugins: [
             [
               rehypePrettyCode,
               {
                 theme: "github-dark",
+                keepBackground: false,
                 onVisitLine(node: Element) {
                   // prevent empty lines from collapsing
                   if (node.children.length === 0) {
@@ -78,11 +82,13 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
   }
 
   return (
-    <MDXProvider components={components}>
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
-        <MDXContent />
-      </div>
-    </MDXProvider>
+    <Prose>
+      <MDXProvider components={components}>
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
+          <MDXContent />
+        </div>
+      </MDXProvider>
+    </Prose>
   );
 };
 
