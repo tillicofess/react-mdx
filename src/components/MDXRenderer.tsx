@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { evaluate } from "@mdx-js/mdx";
-import remarkGfm from 'remark-gfm';
+import remarkGfm from "remark-gfm";
 import rehypePrettyCode from "rehype-pretty-code";
+import { visit } from "unist-util-visit";
 import { MDXProvider } from "@mdx-js/react";
 import * as runtime from "react/jsx-runtime";
 import * as provider from "@mdx-js/react";
@@ -33,6 +34,19 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
           remarkPlugins: [remarkGfm],
           // 添加 data-language
           rehypePlugins: [
+            () => (tree) => {
+              visit(tree, (node) => {
+                if (node?.type === "element" && node?.tagName === "pre") {
+                  const [codeEl] = node.children;
+                  if (codeEl.tagName !== "code") {
+                    return;
+                  }
+
+                  node.__rawString__ = codeEl.children?.[0].value;
+                  // console.log("Raw string extracted:", node.__rawString__);
+                }
+              });
+            },
             [
               rehypePrettyCode,
               {
@@ -46,6 +60,23 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
                 },
               },
             ],
+            () => (tree) => {
+              visit(tree, (node) => {
+                if (node?.type === "element" && node?.tagName === "figure") {
+                  if (!("data-rehype-pretty-code-figure" in node.properties)) {
+                    return;
+                  }
+
+                  const preElement = node.children.at(-1);
+                  // console.log("preElement:", { preElement });
+                  if (preElement.tagName !== "pre") {
+                    return;
+                  }
+                  // console.log("node:", { node });
+                  preElement.properties["__rawString__"] = node.__rawString__;
+                }
+              });
+            },
           ],
           development: false,
         });

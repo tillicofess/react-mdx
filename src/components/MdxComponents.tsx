@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Code } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
+import { CopyButton } from "./copy-button";
 
 export const components = {
   table: Table,
@@ -28,8 +29,34 @@ export const components = {
       />
     );
   },
-  pre({ ...props }) {
-    return <pre {...props} />;
+  pre({
+    __withMeta__,
+    __rawString__,
+    __pnpmCommand__,
+    __yarnCommand__,
+    __npmCommand__,
+    __bunCommand__,
+    ...props
+  }: React.ComponentProps<"pre"> & {
+    __withMeta__?: boolean;
+    __rawString__?: string;
+    __pnpmCommand__?: string;
+    __yarnCommand__?: string;
+    __npmCommand__?: string;
+    __bunCommand__?: string;
+  }) {
+    return (
+      <>
+        <pre {...props} />
+
+        {__rawString__ && (
+          <CopyButton
+            className={cn("absolute top-2 right-2", __withMeta__ && "top-9")}
+            value={__rawString__}
+          />
+        )}
+      </>
+    );
   },
   code: Code,
 };
