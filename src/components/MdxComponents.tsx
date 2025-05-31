@@ -9,6 +9,8 @@ import {
 import { Code } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import { CopyButton } from "./copy-button";
+import { CodeTabs } from "./code-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const components = {
   table: Table,
@@ -59,4 +61,9 @@ export const components = {
     );
   },
   code: Code,
+  CodeTabs,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 };
