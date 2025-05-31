@@ -9,6 +9,7 @@ import * as provider from "@mdx-js/react";
 import { components } from "./MdxComponents";
 import type { Element } from "hast";
 import { Prose } from "@/components/ui/typography";
+import { rehypeNpmCommand } from "@/lib/rehype-npm-command";
 
 interface MDXRendererProps {
   mdxContent: string;
@@ -31,9 +32,13 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
         const { default: Component } = await evaluate(mdxContent, {
           ...provider,
           ...runtime,
-          remarkPlugins: [remarkGfm],
+          remarkPlugins: [
+            // 支持GFM语法
+            remarkGfm,
+          ],
           // 添加 data-language
           rehypePlugins: [
+            // 提取原始字符串
             () => (tree) => {
               visit(tree, (node) => {
                 if (node?.type === "element" && node?.tagName === "pre") {
@@ -47,6 +52,7 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
                 }
               });
             },
+
             [
               rehypePrettyCode,
               {
@@ -60,6 +66,8 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
                 },
               },
             ],
+
+            // 提取代码块元数据
             () => (tree) => {
               visit(tree, (node) => {
                 if (node?.type === "element" && node?.tagName === "figure") {
@@ -73,10 +81,14 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
                     return;
                   }
                   // console.log("node:", { node });
+                  preElement.properties["__withMeta__"] =
+                    node.children.at(0).tagName === "figcaption";
                   preElement.properties["__rawString__"] = node.__rawString__;
                 }
               });
             },
+
+            rehypeNpmCommand,
           ],
           development: false,
         });

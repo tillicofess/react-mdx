@@ -25,6 +25,7 @@
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7",
+    "unist-builder": "^3.0.0",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {

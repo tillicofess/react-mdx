@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { CopyButton } from "./copy-button";
 import { CodeTabs } from "./code-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CodeBlockCommand } from "./code-block-command";
+
+import { type NpmCommands } from "@/types/unist";
 
 export const components = {
   table: Table,
@@ -42,11 +45,30 @@ export const components = {
   }: React.ComponentProps<"pre"> & {
     __withMeta__?: boolean;
     __rawString__?: string;
-    __pnpmCommand__?: string;
-    __yarnCommand__?: string;
-    __npmCommand__?: string;
-    __bunCommand__?: string;
-  }) {
+  } & NpmCommands) {
+    console.log("props:", {
+      __withMeta__,
+      __rawString__,
+      __pnpmCommand__,
+      __yarnCommand__,
+      __npmCommand__,
+      __bunCommand__,
+      ...props,
+    });
+
+    const isNpmCommand =
+      __pnpmCommand__ && __yarnCommand__ && __npmCommand__ && __bunCommand__;
+
+    if (isNpmCommand) {
+      return (
+        <CodeBlockCommand
+          __pnpmCommand__={__pnpmCommand__}
+          __yarnCommand__={__yarnCommand__}
+          __npmCommand__={__npmCommand__}
+          __bunCommand__={__bunCommand__}
+        />
+      );
+    }
     return (
       <>
         <pre {...props} />
