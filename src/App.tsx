@@ -9,13 +9,11 @@ function App() {
   );
   const [mdxContent, setMdxContent] = useState<string>("");
   const [frontmatter, setFrontmatter] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadContent = async () => {
       try {
-        setLoading(true);
         setError(null);
 
         // 读取MDX文件内容
@@ -28,20 +26,11 @@ function App() {
         console.error("Error loading MDX content:", err);
         setError(err instanceof Error ? err.message : "Failed to load content");
       } finally {
-        setLoading(false);
       }
     };
 
     loadContent();
   }, [currentFile]);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <h2>Loading MDX Content...</h2>
-      </div>
-    );
-  }
 
   if (error) {
     return (

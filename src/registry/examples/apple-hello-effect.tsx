@@ -1,72 +1,13 @@
----
-title: Writing Effect inspired by Apple
-description: Create a "Xin chào" and "Hello" writing effect inspired by Apple using Motion for React.
-image: /images/blog/writing-effect-inspired-by-apple-1.webp
-createdAt: 2025-03-08
-updatedAt: 2025-04-02
----
-
-<ComponentPreview name="apple-hello-effect-demo" >
-```tsx
-import { AppleHelloVietnameseEffect } from "@/components/apple-hello-effect";
- 
-export function AppleHelloEffectDemo() {
-  return <AppleHelloVietnameseEffect />;
-}
-```
-</ComponentPreview>
-
-## Installation
-
-<CodeTabs className="gap-0">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-
-<TabsContent value="cli" className="[&>figure]:mb-0">
-
-```bash
-npx shadcn@latest add https://chanhdai.com/r/apple-hello-effect.json
-```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-### Install dependencies
-
-```bash
-npm install motion clsx tailwind-merge
-```
-
-### Add util file
-
-```tsx
-import { ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
- 
-export const cn = (...inputs: ClassValue[]) => {
-  return twMerge(clsx(inputs));
-};
-```
-
-### Copy the source code
-
-```tsx
-"use client";
-
 import { motion } from "motion/react";
 
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 type Props = React.ComponentProps<typeof motion.svg> & {
   speed?: number;
   onAnimationComplete?: () => void;
 };
 
-export function AppleHelloVietnameseEffect({
+export default function AppleHelloVietnameseEffect({
   className,
   speed = 1,
   onAnimationComplete,
@@ -336,42 +277,3 @@ export function AppleHelloEnglishEffect({
     </motion.svg>
   );
 }
-
-```
-
-</TabsContent>
-
-</CodeTabs>
-
-## Usage
-
-```tsx
-import {
-  AppleHelloVietnameseEffect,
-  AppleHelloEnglishEffect,
-} from "@/components/apple-hello-effect";
-```
-
-```tsx
-<AppleHelloVietnameseEffect />
-<AppleHelloEnglishEffect />
-```
-
-## Props
-
-| Prop                  | Type         | Default     | Description                                                                                                                                            |
-| --------------------- | ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `speed`               | `number`     | 1           | <p className="whitespace-normal" style={{ width: 280 }}>A multiplier that affects the animation duration. Higher values make the animation slower.</p> |
-| `onAnimationComplete` | `() => void` | `undefined` | <p className="whitespace-normal" style={{ width: 280 }}>Callback function triggered when the animation completes.</p>                                  |
-
-## Acknowledgments
-
-- Official Apple Hello Lettering, extracted from macOS Sonoma in SVG Form: https://www.figma.com/community/file/1414773009964314315/official-apple-hello-lettering
-- A modern animation library for JavaScript and React: https://motion.dev
-- Run your own component registry: https://ui.shadcn.com/docs/registry
-
-## References
-
-- https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pathLength
-- https://motion.dev/docs/react-motion-component
-- https://motion.dev/docs/react-animate-presence

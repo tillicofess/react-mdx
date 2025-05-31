@@ -12,6 +12,7 @@ import { CopyButton } from "./copy-button";
 import { CodeTabs } from "./code-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeBlockCommand } from "./code-block-command";
+import { ComponentPreview } from "@/components/component-preview";
 
 import { type NpmCommands } from "@/types/unist";
 
@@ -46,15 +47,15 @@ export const components = {
     __withMeta__?: boolean;
     __rawString__?: string;
   } & NpmCommands) {
-    console.log("props:", {
-      __withMeta__,
-      __rawString__,
-      __pnpmCommand__,
-      __yarnCommand__,
-      __npmCommand__,
-      __bunCommand__,
-      ...props,
-    });
+    // console.log("props:", {
+    //   __withMeta__,
+    //   __rawString__,
+    //   __pnpmCommand__,
+    //   __yarnCommand__,
+    //   __npmCommand__,
+    //   __bunCommand__,
+    //   ...props,
+    // });
 
     const isNpmCommand =
       __pnpmCommand__ && __yarnCommand__ && __npmCommand__ && __bunCommand__;
@@ -88,4 +89,5 @@ export const components = {
   TabsContent,
   TabsList,
   TabsTrigger,
+  ComponentPreview
 };

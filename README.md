@@ -2,6 +2,9 @@
 
 🚀 一个基于 React + TypeScript + Vite 的 MDX 运行时编译和渲染项目
 
+## 🎉 灵感来源
+本项目灵感来自 ncdai/chanhdai.com，将mdx改为SPA的运行时渲染。
+
 ## ✨ 功能特性
 
 - 🔥 **运行时 MDX 编译** - 动态编译和渲染 MDX 内容

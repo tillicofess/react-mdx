@@ -10,6 +10,7 @@ import { components } from "./MdxComponents";
 import type { Element } from "hast";
 import { Prose } from "@/components/ui/typography";
 import { rehypeNpmCommand } from "@/lib/rehype-npm-command";
+import rehypeExternalLinks from "rehype-external-links";
 
 interface MDXRendererProps {
   mdxContent: string;
@@ -20,12 +21,10 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
     null
   );
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const compileMDX = async () => {
       try {
-        setLoading(true);
         setError(null);
 
         // 使用evaluate方法编译MDX内容
@@ -38,6 +37,11 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
           ],
           // 添加 data-language
           rehypePlugins: [
+            [
+              rehypeExternalLinks,
+              { target: "_blank", rel: "nofollow noopener noreferrer" },
+            ],
+
             // 提取原始字符串
             () => (tree) => {
               visit(tree, (node) => {
@@ -98,7 +102,6 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
         console.error("MDX compilation error:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setLoading(false);
       }
     };
 
@@ -106,10 +109,6 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
       compileMDX();
     }
   }, [mdxContent]);
-
-  if (loading) {
-    return <div>Loading MDX content...</div>;
-  }
 
   if (error) {
     return (
