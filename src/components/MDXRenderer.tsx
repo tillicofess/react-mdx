@@ -126,9 +126,7 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
   return (
     <Prose>
       <MDXProvider components={components}>
-        <div className="md:max-w-3xl mx-auto px-4">
-          <MDXContent />
-        </div>
+        <MDXContent />
       </MDXProvider>
     </Prose>
   );

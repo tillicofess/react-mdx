@@ -143,6 +143,10 @@
     text-rendering: optimizeLegibility;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--d-border) transparent;
