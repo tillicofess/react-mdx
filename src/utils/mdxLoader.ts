@@ -1,26 +1,26 @@
 // 读取MDX文件内容的工具函数
 // ⚠️ NOTE: 仅用于本地开发调试，生产环境需替换为服务端接口请求
-export const loadMDXFile = async (filePath: string): Promise<string> => {
+export const loadMDXFile = async (slug: string): Promise<string> => {
   try {
     // 使用动态import来加载MDX文件作为文本
     let content: string;
 
-    if (filePath.includes("welcome.mdx")) {
+    if (slug.includes("welcome")) {
       const module = await import("../mdx/content/welcome.mdx?raw");
       content = module.default;
-    } else if (filePath.includes("example.mdx")) {
-      const module = await import("../mdx/content/example.mdx?raw");
+    } else if (slug.includes("uptime-kuma")) {
+      const module = await import("../mdx/content/uptime-kuma.mdx?raw");
       content = module.default;
-    } else if (filePath.includes("awesome-terminal.mdx")) {
+    } else if (slug.includes("awesome-terminal")) {
       const module = await import("../mdx/content/awesome-terminal.mdx?raw");
       content = module.default;
-    } else if (filePath.includes("writing-effect-inspired-by-apple.mdx")) {
+    } else if (slug.includes("writing-effect-inspired-by-apple")) {
       const module = await import(
         "../mdx/content/writing-effect-inspired-by-apple.mdx?raw"
       );
       content = module.default;
     } else {
-      throw new Error(`Unsupported MDX file: ${filePath}`);
+      throw new Error(`Unsupported MDX file: ${slug}`);
     }
 
     // 检查返回的内容是否是有效的MDX内容
