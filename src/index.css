@@ -42,6 +42,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-border: var(--d-border);
   --font-heading: var(--font-sans);
+  --color-grid: var(--d-grid);
 }
 
 @font-face {
@@ -94,6 +95,7 @@
   --d-border: oklch(0.92 0.004 286.32);
   --font-sans: "RobotoCondensed", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains-Mono", ui-sans-serif, system-ui, sans-serif;
+  --d-grid: oklch(0.967 0.001 286.375);
 }
 
 .dark {
@@ -128,6 +130,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --d-grid: oklch(0.967 0.001 286.375);
 }
 
 @layer base {
@@ -186,4 +189,12 @@
   code[data-line-numbers-max-digits="4"] > [data-line]::before {
     @apply w-9;
   }
+}
+
+@utility screen-line-before {
+  @apply relative before:absolute before:top-0 before:-left-[100vw] before:-z-1 before:h-px before:w-[200vw] before:bg-grid;
+}
+
+@utility screen-line-after {
+  @apply relative after:absolute after:bottom-0 after:-left-[100vw] after:-z-1 after:h-px after:w-[200vw] after:bg-grid;
 }

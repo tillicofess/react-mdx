@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import Blog from "./features/blog/components";
+import Header from "@/features/profile/header";
+import Blog from "@/features/blog/components";
 
 function Pattern() {
   return (
@@ -17,6 +18,9 @@ function App() {
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">
+        <Header />
+        <Pattern />
+
         <Blog />
         <Pattern />
       </div>

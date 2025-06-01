@@ -1,6 +1,8 @@
 import { type BlogType } from "../types";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router";
+import dayjs from "dayjs";
+
 export default function BlogItemLink({ blog }: { blog: BlogType }) {
   return (
     <Link
@@ -25,9 +27,16 @@ export default function BlogItemLink({ blog }: { blog: BlogType }) {
       )}
 
       <div className="flex flex-col gap-1 p-2">
-        <h3 className="font-mono text-sm leading-snug font-medium text-balance underline-offset-4 group-hover/post:underline">
+        <h3 className="flex items-center font-heading font-medium underline-offset-4 group-hover/social-link:underline">
           {blog.metadata.title}
         </h3>
+
+        <time
+          className="font-mono text-sm text-muted-foreground"
+          dateTime={dayjs(blog.metadata.createdAt).toISOString()}
+        >
+          {dayjs(blog.metadata.createdAt).format("YYYY.MM.DD")}
+        </time>
       </div>
     </Link>
   );

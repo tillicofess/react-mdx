@@ -3,28 +3,32 @@
     "slug": "awesome-terminal",
     "metadata": {
       "title": "Awesome Terminal (iTerm2 + Zsh + Oh My Zsh + Amazon Q)",
-      "image": "/blog/awesome-terminal-1.webp"
+      "image": "/blog/awesome-terminal-1.webp",
+      "createdAt": "2022-04-26"
     }
   },
   {
     "slug": "uptime-kuma",
     "metadata": {
       "title": "Installing Uptime Kuma with Docker and setting up NGINX with SSL",
-      "image": "/blog/uptime-kuma-1.webp"
+      "image": "/blog/uptime-kuma-1.webp",
+      "createdAt": "2022-04-26"
     }
   },
   {
     "slug": "welcome",
     "metadata": {
       "title": "Welcome to chanhdai.com",
-      "image": "/blog/welcome-1.webp"
+      "image": "/blog/welcome-1.webp",
+      "createdAt": "2022-04-26"
     }
   },
   {
     "slug": "writing-effect-inspired-by-apple",
     "metadata": {
       "title": "Writing Effect inspired by Apple",
-      "image": "/blog/writing-effect-inspired-by-apple-1.webp"
+      "image": "/blog/writing-effect-inspired-by-apple-1.webp",
+      "createdAt": "2022-04-26"
     }
   }
 ]
