@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Blog from "@/features/blog/components";
+import { signInWithCredentials, test } from "@/firebase/auth";
 
 function Pattern() {
   return (
@@ -15,6 +17,10 @@ function Pattern() {
 }
 
 function App() {
+  useEffect(() => {
+    signInWithCredentials("test@test.com", "test123456");
+    // test();
+  }, []);
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">
