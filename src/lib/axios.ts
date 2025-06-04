@@ -4,10 +4,16 @@ import axios, {
   type AxiosResponse,
 } from "axios";
 
+import { getApiConfig, isDevelopment } from "../config/env";
+
+// 获取当前环境的 API 配置
+const apiConfig = getApiConfig();
+
 // 创建 axios 实例
 const instance: AxiosInstance = axios.create({
-  baseURL: "/api", // 使用代理路径
-  timeout: 10000, // 请求超时时间
+  baseURL: apiConfig.baseURL,
+  timeout: apiConfig.timeout,
+  withCredentials: apiConfig.withCredentials,
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,7 +23,9 @@ const instance: AxiosInstance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     // 在发送请求之前做些什么
-    console.log("Request sent:", config.method?.toUpperCase(), config.url);
+    if (isDevelopment) {
+      console.log("🚀 Request sent:", config.method?.toUpperCase(), config.url);
+    }
 
     // 可以在这里添加 token
     // const token = localStorage.getItem('token');
@@ -38,16 +46,20 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
     // 2xx 范围内的状态码都会触发该函数
-    console.log("Response received:", response.status, response.config.url);
+    if (isDevelopment) {
+      console.log("✅ Response received:", response.status, response.config.url);
+    }
     return response;
   },
   (error) => {
     // 超出 2xx 范围的状态码都会触发该函数
-    console.error(
-      "Response error:",
-      error.response?.status,
-      error.response?.data
-    );
+    if (isDevelopment) {
+      console.error(
+        "❌ Response error:",
+        error.response?.status,
+        error.response?.data
+      );
+    }
 
     // 统一错误处理
     if (error.response?.status === 401) {

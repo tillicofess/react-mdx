@@ -1,29 +1,59 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "./firebaseConfig";
+import { http } from "../lib/axios";
 
-// 邮箱登录
-export async function signInWithCredentials(email: string, password: string) {
-  signInWithEmailAndPassword(firebaseAuth, email, password).then(
-    async (userCredential) => {
-      const token = await userCredential.user.getIdToken();
+export const signInWithCredentials = async (
+  email: string,
+  password: string
+) => {
+  try {
+    const storedEmail = localStorage.getItem("userEmail");
 
-      // 把 token 交给后端设置 Cookie（使用代理避免跨域问题）
-      await fetch("/api/sso/set-cookie", {
-        // const result = await fetch("https://ticscreek.top/test/sso/set-cookie", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-        credentials: "include", // 必须启用，发送 cookie
-      });
+    if (storedEmail === email) {
+      try {
+        const meResponse = await http.get("/sso/me");
+
+        console.log("User data from /sso/me:", meResponse.data);
+        return meResponse.data;
+      } catch (error) {
+        console.log(
+          "Failed to get user data from /sso/me, proceeding with login:",
+          error
+        );
+      }
     }
-  );
-}
 
-export async function test() {
-  const res = await fetch("/api/sso/me", {
-    credentials: "include", // 必须加
-  });
-  const a = await res.json();
+    const userCredential = await signInWithEmailAndPassword(
+      firebaseAuth,
+      email,
+      password
+    );
 
-  console.log(a);
-}
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+
+    await http.post("/sso/set-cookie", { token });
+
+    localStorage.setItem("userEmail", user.email || "");
+
+    const meResponse = await http.get("/sso/me");
+
+    console.log("User data:", meResponse.data);
+    return meResponse.data;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+};
+
+export const test = async () => {
+  try {
+    const meResponse = await http.get("/sso/me");
+
+    console.log("User data from test:", meResponse.data);
+    return meResponse.data;
+  } catch (error) {
+    console.error("Test error:", error);
+    throw error;
+  }
+};
