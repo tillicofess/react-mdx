@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Blog from "@/features/blog/components";
 import { getUserInfo } from "@/firebase/auth";
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
 
 function Pattern() {
@@ -19,12 +19,12 @@ function Pattern() {
 }
 
 function App() {
-  const setLogin = useSetAtom(authAtom);
+  const [login, setLogin] = useAtom(authAtom);
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const user = await getUserInfo();
-        if (user.email) {
+        if (user?.email) {
           setLogin(() => {
             return {
               isLoggedIn: true,
@@ -33,8 +33,8 @@ function App() {
             };
           });
         }
-      } catch (error) {
-        console.error("Failed to get user info:", error);
+      } catch (error: any) {
+        console.log(error.message);
       }
     };
 
@@ -44,6 +44,7 @@ function App() {
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">
+        <div>{login.isLoggedIn ? "已登录" : "未登录"}</div>
         <Header />
         <Pattern />
 

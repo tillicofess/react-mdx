@@ -15,7 +15,6 @@ import { useNavigate } from "react-router";
 import { http } from "@/lib/axios";
 import { useSetAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
-import { type user } from "@/types/user";
 export function LoginForm({
   className,
   ...props
@@ -25,7 +24,6 @@ export function LoginForm({
 
   // 登录
   async function signIn(id: string, formData?: FormData) {
-    let result = {} as user;
     try {
       if (id === "credentials") {
         const email = formData?.get("email") as string;
@@ -33,23 +31,26 @@ export function LoginForm({
         if (!email || !password) {
           return {};
         }
-        result = await signInWithCredentials(email, password);
-      }
+        const result = await signInWithCredentials(email, password);
 
-      if (result.email) {
-        setLogin(() => {
-          return {
-            isLoggedIn: true,
-            email: result.email,
-            role: result.role || "user",
-          };
-        });
-        navigate("/", { replace: true });
-        return {};
+        if (result.email) {
+          setLogin(() => {
+            return {
+              isLoggedIn: true,
+              email: result.email,
+              role: result.role || "user",
+            };
+          });
+          navigate("/", { replace: true });
+          return {};
+        }
+
+        return { error: "登录失败" };
       }
-      return { error: "Failed to sign in" };
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      // 捕获 throw 的错误
+      console.log(error.message);
+      return { error: error || "未知错误" };
     }
   }
 
