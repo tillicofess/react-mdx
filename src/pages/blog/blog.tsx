@@ -1,4 +1,4 @@
-import Panel, { PanelHeader, PanelTitle } from "@/features/panel";
+import Panel, { PanelHeader, PanelTitle } from "@/features/profile/components/panel";
 import BlogItemLink from "@/features/blog/components/blogItem";
 import blogData from "@/features/blog/blog-data.json";
 

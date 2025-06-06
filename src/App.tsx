@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Blog from "@/features/blog/components";
-import { signInWithCredentials, test } from "@/firebase/auth";
+import { getUserInfo } from "@/firebase/auth";
+import { useSetAtom } from "jotai";
+import { authAtom } from "@/hooks/auth";
 
 function Pattern() {
   return (
@@ -17,10 +19,28 @@ function Pattern() {
 }
 
 function App() {
+  const setLogin = useSetAtom(authAtom);
   useEffect(() => {
-    signInWithCredentials("test@test.com", "test123456");
-    // test();
+    const fetchUserInfo = async () => {
+      try {
+        const user = await getUserInfo();
+        if (user.email) {
+          setLogin(() => {
+            return {
+              isLoggedIn: true,
+              email: user.email,
+              role: user.role,
+            };
+          });
+        }
+      } catch (error) {
+        console.error("Failed to get user info:", error);
+      }
+    };
+
+    fetchUserInfo();
   }, []);
+
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">

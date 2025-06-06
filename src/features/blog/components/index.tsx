@@ -1,4 +1,4 @@
-import Panel, { PanelHeader, PanelTitle } from "@/features/panel";
+import Panel, { PanelHeader, PanelTitle } from "@/features/profile/components/panel";
 import BlogItemLink from "./blogItem";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
