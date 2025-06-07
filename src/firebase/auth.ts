@@ -45,3 +45,13 @@ export const getUserInfo = async () => {
     console.error("❌ getUserInfo error:", error.response?.data.code);
   }
 };
+
+export const signOut = async () => {
+  try {
+    const res = await http.post("/sso/logout");
+    console.log("Response from /sso//logout:", res.data);
+    return res.data;
+  } catch (error: any) {
+    console.error("❌ signOut error:", error.response?.data.code);
+  }
+};

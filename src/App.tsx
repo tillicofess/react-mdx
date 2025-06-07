@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Blog from "@/features/blog/components";
 import { getUserInfo } from "@/firebase/auth";
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
 
 function Pattern() {
@@ -19,22 +19,18 @@ function Pattern() {
 }
 
 function App() {
-  const [login, setLogin] = useAtom(authAtom);
+  const setLogin = useSetAtom(authAtom);
   useEffect(() => {
     const fetchUserInfo = async () => {
-      try {
-        const user = await getUserInfo();
-        if (user?.email) {
-          setLogin(() => {
-            return {
-              isLoggedIn: true,
-              email: user.email,
-              role: user.role,
-            };
-          });
-        }
-      } catch (error: any) {
-        console.log(error.message);
+      const user = await getUserInfo();
+      if (user && user.email) {
+        setLogin(() => {
+          return {
+            isLoggedIn: true,
+            email: user.email,
+            role: user.role,
+          };
+        });
       }
     };
 
@@ -44,7 +40,6 @@ function App() {
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">
-        <div>{login.isLoggedIn ? "已登录" : "未登录"}</div>
         <Header />
         <Pattern />
 

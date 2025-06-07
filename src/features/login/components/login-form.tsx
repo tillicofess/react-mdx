@@ -41,7 +41,7 @@ export function LoginForm({
               role: result.role || "user",
             };
           });
-          navigate("/", { replace: true });
+          navigate("/");
           return {};
         }
 

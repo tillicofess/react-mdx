@@ -22,15 +22,15 @@ export default defineConfig({
         secure: true, // 本地开发使用 HTTP
         cookieDomainRewrite: "localhost", // 重写 cookie 的 domain 为 localhost
         rewrite: (path) => path.replace(/^\/api/, "/test"), // 根据实际接口路径调整
-        configure: (proxy) => {
-          proxy.on("proxyRes", (proxyRes, req, res) => {
-            const cookies = proxyRes.headers["set-cookie"];
-            if (cookies) {
-              // 打印 set-cookie 头
-              console.log("Set-Cookie from backend:", cookies);
-            }
-          });
-        },
+        // configure: (proxy) => {
+        //   proxy.on("proxyRes", (proxyRes, req, res) => {
+        //     const cookies = proxyRes.headers["set-cookie"];
+        //     if (cookies) {
+        //       // 打印 set-cookie 头
+        //       console.log("Set-Cookie from backend:", cookies);
+        //     }
+        //   });
+        // },
         agent: httpProxyAgent,
       },
     },

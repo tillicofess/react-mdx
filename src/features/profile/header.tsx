@@ -1,7 +1,7 @@
 import { AppleHelloEnglishEffect } from "@/registry/examples/apple-hello-effect";
 import { cn } from "@/lib/utils";
 import { Nav } from "./components/nav";
-// import NavItemLogin from "@/components/nav-item-login";
+import NavItemLogin from "./components/nav-item-login";
 import { USER } from "./data/user";
 // import { FlipSentences } from "./flipSentences/flipSentences";
 
@@ -23,9 +23,9 @@ export default function Header() {
       <div className="absolute top-0 right-0 flex items-center gap-3 border-grid bg-background ring ring-grid ring-inset sm:pl-3">
         <Nav className="max-sm:hidden" />
 
-        {/* <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <NavItemLogin />
-        </div> */}
+        </div>
       </div>
 
       <div className="screen-line-after flex border-x border-grid">
