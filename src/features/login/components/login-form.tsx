@@ -10,17 +10,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2Icon } from "lucide-react";
+
+import { useState, useRef, useEffect } from "react";
 import { signInWithCredentials } from "@/firebase/auth";
 import { useNavigate } from "react-router";
 import { http } from "@/lib/axios";
 import { useSetAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
+
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
   const setLogin = useSetAtom(authAtom);
+  const isMounted = useRef(true);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   // 登录
   async function signIn(id: string, formData?: FormData) {
@@ -42,15 +54,11 @@ export function LoginForm({
             };
           });
           navigate("/");
-          return {};
         }
-
-        return { error: "登录失败" };
       }
     } catch (error: any) {
       // 捕获 throw 的错误
       console.log(error.message);
-      return { error: error || "未知错误" };
     }
   }
 
@@ -78,8 +86,16 @@ export function LoginForm({
   // 处理登录
   const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
     const formData = new FormData(e.currentTarget);
-    signIn("credentials", formData);
+    try {
+      await signIn("credentials", formData);
+    } finally {
+      if (isMounted.current) {
+        setLoading(false); // ✅ 仅在组件还挂载时更新状态
+      }
+    }
   };
 
   // 处理注册
@@ -158,8 +174,19 @@ export function LoginForm({
                           required
                         />
                       </div>
-                      <Button type="submit" className="w-full">
-                        Login
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={loading}
+                      >
+                        {!loading ? (
+                          "Login"
+                        ) : (
+                          <>
+                            <Loader2Icon className="animate-spin" />
+                            Please wait
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
