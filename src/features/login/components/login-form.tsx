@@ -18,6 +18,7 @@ import { useNavigate } from "react-router";
 import { http } from "@/lib/axios";
 import { useSetAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
+import { getUserInfo } from "@/firebase/auth";
 
 export function LoginForm({
   className,
@@ -29,10 +30,18 @@ export function LoginForm({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    init();
     return () => {
       isMounted.current = false;
     };
   }, []);
+
+  async function init() {
+    const user = await getUserInfo();
+    if (user && user.email) {
+      navigate("/");
+    }
+  }
 
   // 登录
   async function signIn(id: string, formData?: FormData) {

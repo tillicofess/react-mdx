@@ -1,8 +1,21 @@
-import { GalleryVerticalEnd } from "lucide-react";
+import { useEffect } from "react";
+import { useAtomValue } from "jotai";
+import { authAtom } from "@/hooks/auth";
+import { useNavigate } from "react-router";
 
+import { GalleryVerticalEnd } from "lucide-react";
 import { LoginForm } from "@/features/login/components/login-form";
 
 export default function LoginPage() {
+  const login = useAtomValue(authAtom);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(login.isLoggedIn);
+    if (login.isLoggedIn) {
+      navigate("/");
+    }
+  });
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
