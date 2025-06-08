@@ -10,8 +10,8 @@ export const USER = {
 
 export const NAV_LINKS = [
   {
-    title: "Tool",
-    href: "#tool",
+    title: "Accordion",
+    href: "#Accordion",
   },
   {
     title: "Blog",

@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
+import Accordions from "@/features/profile/components/accordion";
+import { TeckStack } from "@/features/profile/components/teck-stack";
 import Blog from "@/features/blog/components";
 import { getUserInfo } from "@/firebase/auth";
 import { useSetAtom } from "jotai";
@@ -40,7 +42,14 @@ function App() {
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">
+        
         <Header />
+        <Pattern />
+
+        <TeckStack />
+        <Pattern />
+
+        <Accordions />
         <Pattern />
 
         <Blog />
