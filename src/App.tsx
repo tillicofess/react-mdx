@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Accordions from "@/features/profile/components/accordion";
 import { TeckStack } from "@/features/profile/components/teck-stack";
 import Blog from "@/features/blog/components";
 import { getUserInfo } from "@/firebase/auth";
-import { useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
 
 function Pattern() {
@@ -21,28 +21,26 @@ function Pattern() {
 }
 
 function App() {
-  const setLogin = useSetAtom(authAtom);
+  const [user, setUser] = useAtom(authAtom);
+  const hasFetchedRef = useRef(false);
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const user = await getUserInfo();
-      if (user && user.email) {
-        setLogin(() => {
-          return {
-            isLoggedIn: true,
-            email: user.email,
-            role: user.role,
-          };
-        });
+    console.log("user", user);
+    const init = async () => {
+      if (hasFetchedRef.current || user?.email) return;
+      hasFetchedRef.current = true;
+
+      const fetchedUser = await getUserInfo();
+      if (fetchedUser?.email) {
+        setUser({ email: fetchedUser.email, role: fetchedUser.role || "user" });
       }
     };
 
-    fetchUserInfo();
-  }, []);
+    init();
+  }, [user, setUser]);
 
   return (
     <div className="max-w-screen overflow-x-hidden">
       <div className="mx-auto px-4 md:max-w-3xl">
-        
         <Header />
         <Pattern />
 

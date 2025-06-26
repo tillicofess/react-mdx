@@ -12,12 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAtom } from "jotai";
 import { authAtom } from "@/hooks/auth";
-
 import { signOut } from "@/firebase/auth";
+import { toast } from "sonner";
 
 export default function NavItemLogin() {
   const navigate = useNavigate();
-  const [login, setLogin] = useAtom(authAtom);
+  const [user, setUser] = useAtom(authAtom);
 
   const handleLogIn = () => {
     navigate("/login");
@@ -25,12 +25,12 @@ export default function NavItemLogin() {
 
   const handleLogOut = async () => {
     const res = await signOut();
-    if (res.message == "已退出") {
-      setLogin({
-        isLoggedIn: false,
+    if (res?.message === "退出成功") {
+      setUser({
         email: "",
         role: "user",
       });
+      toast.success("退出成功");
     }
   };
 
@@ -45,8 +45,8 @@ export default function NavItemLogin() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {login.isLoggedIn ? (
-          <DropdownMenuLabel>{login.email}</DropdownMenuLabel>
+        {user.email ? (
+          <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
         ) : (
           <DropdownMenuLabel>shadcn</DropdownMenuLabel>
         )}
@@ -56,7 +56,7 @@ export default function NavItemLogin() {
           <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {login.isLoggedIn ? (
+        {user.email ? (
           <DropdownMenuItem onSelect={handleLogOut}>Log out</DropdownMenuItem>
         ) : (
           <DropdownMenuItem onSelect={handleLogIn}>Log in</DropdownMenuItem>

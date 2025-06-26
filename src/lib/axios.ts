@@ -26,13 +26,6 @@ instance.interceptors.request.use(
     if (isDevelopment) {
       console.log("🚀 Request sent:", config.method?.toUpperCase(), config.url);
     }
-
-    // 可以在这里添加 token
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-
     return config;
   },
   (error) => {
@@ -47,32 +40,37 @@ instance.interceptors.response.use(
   (response: AxiosResponse) => {
     // 2xx 范围内的状态码都会触发该函数
     if (isDevelopment) {
-      console.log("✅ Response received:", response.status, response.config.url);
+      console.log(
+        "✅ Response received:",
+        response.status,
+        response.config.url
+      );
+      console.log("Response data:", response.data);
     }
     return response;
   },
   (error) => {
     // 超出 2xx 范围的状态码都会触发该函数
-    if (isDevelopment) {
-      console.error(
-        "❌ Response error:",
-        error.response?.status,
-        error.response?.data
-      );
-    }
+    // if (isDevelopment) {
+    //   console.error(
+    //     "❌ Response error:",
+    //     error.response?.status,
+    //     error.response?.data
+    //   );
+    // }
 
-    // 统一错误处理
-    if (error.response?.status === 401) {
-      // 未授权，可以跳转到登录页
-      console.warn("Unauthorized access - redirecting to login");
-      // window.location.href = '/login';
-    } else if (error.response?.status === 403) {
-      // 禁止访问
-      console.warn("Access forbidden");
-    } else if (error.response?.status >= 500) {
-      // 服务器错误
-      console.error("Server error");
-    }
+    // // 统一错误处理
+    // if (error.response?.status === 401) {
+    //   // 未授权，可以跳转到登录页
+    //   console.warn("Unauthorized access - redirecting to login");
+    //   // window.location.href = '/login';
+    // } else if (error.response?.status === 403) {
+    //   // 禁止访问
+    //   console.warn("Access forbidden");
+    // } else if (error.response?.status >= 500) {
+    //   // 服务器错误
+    //   console.error("Server error");
+    // }
 
     return Promise.reject(error);
   }
@@ -131,7 +129,7 @@ export default instance;
 export interface ApiResponse<T = any> {
   code: number;
   message: string;
-  data: T;
+  data: T | null;
 }
 
 // 封装带有统一响应格式的请求方法
