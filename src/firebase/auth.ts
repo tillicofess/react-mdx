@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "./firebaseConfig";
-import { http, api } from "../lib/axios";
+import { api } from "../lib/axios";
 
 // 登录
 export const signInWithCredentials = async (
@@ -13,24 +13,34 @@ export const signInWithCredentials = async (
       email,
       password
     );
-
     const token = await userCredential.user.getIdToken();
-    const res = await http.post("/sso/set-cookie", { token });
-
+    const res = await api.post("/sso/set-cookie", { token });
+    if (res.data?.code !== 0) {
+      throw new Error(res.data?.message);
+    }
     return res.data;
   } catch (error: any) {
+    const firebaseCode = error.code;
+    const firebaseMsg = error.message;
+
     // 打印日志
-    console.error("❌ signInWithCredentials error:", error.code);
+    console.error("❌ signInWithCredentials error:", {
+      code: firebaseCode,
+      message: firebaseMsg,
+    });
 
-    // 判断具体错误
-    const errorCode = error.code;
-
-    if (errorCode === "auth/invalid-credential") {
-      // 抛出用于 UI 的结构化错误
-      throw new Error("账号或密码错误");
+    switch (firebaseCode) {
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found":
+        throw new Error("账号或密码错误");
+      case "auth/too-many-requests":
+        throw new Error("登录请求过于频繁，请稍后再试");
+      case "auth/network-request-failed":
+        throw new Error("网络异常，请检查连接");
+      default:
+        throw new Error("登录失败，请稍后再试");
     }
-
-    throw new Error("登录失败，请稍后再试");
   }
 };
 
