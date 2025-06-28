@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Accordions from "@/features/profile/components/accordion";
@@ -23,12 +23,15 @@ function Pattern() {
 function App() {
   const [user, setUser] = useAtom(authAtom);
   const hasFetchedRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
+    setIsLoading(true);
     console.log("user", user);
     const init = async () => {
       if (hasFetchedRef.current || user?.email) return;
-      hasFetchedRef.current = true;
 
+      hasFetchedRef.current = true;
       const fetchedUser = await getUserInfo();
       if (fetchedUser?.email) {
         setUser({ email: fetchedUser.email, role: fetchedUser.role || "user" });
@@ -36,7 +39,12 @@ function App() {
     };
 
     init();
+    setIsLoading(false);
   }, [user, setUser]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="max-w-screen overflow-x-hidden">

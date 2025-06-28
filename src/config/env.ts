@@ -10,7 +10,7 @@ export const API_CONFIG = {
   // 开发环境配置
   development: {
     baseURL: "/api", // 使用 Vite 代理
-    timeout: 10000,
+    timeout: 15000,
     withCredentials: true,
   },
   // 生产环境配置

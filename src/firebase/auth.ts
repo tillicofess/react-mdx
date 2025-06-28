@@ -14,9 +14,9 @@ export const signInWithCredentials = async (
       password
     );
     const token = await userCredential.user.getIdToken();
-    const res = await api.post("/sso/set-cookie", { token });
-    if (res.data?.code !== 0) {
-      throw new Error(res.data?.message);
+    const res = await api.post("/sso/login", { token });
+    if (res.code !== 0) {
+      throw new Error(res.message);
     }
     return res.data;
   } catch (error: any) {

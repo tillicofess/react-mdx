@@ -55,7 +55,7 @@ import { http } from "@/lib/axios";
 const response = await http.get("/sso/me");
 
 // POST 请求
-const result = await http.post("/sso/set-cookie", { token });
+const result = await http.post("/sso/login", { token });
 ```
 
 ### 2. 统一响应格式

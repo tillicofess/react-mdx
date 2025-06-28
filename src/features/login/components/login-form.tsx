@@ -65,8 +65,9 @@ export function LoginForm({
       const result = await signIn("credentials", formData);
       if (!result.success) {
         toast.error(result.error || "Login failed");
+        return;
       }
-      toast("Login success");
+      toast("登录成功！");
       setUser({ email: result.email!, role: result.role || "user" });
     } finally {
       setLoading(false);
