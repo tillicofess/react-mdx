@@ -25,12 +25,12 @@ export default function NavItemLogin() {
 
   const handleLogOut = async () => {
     const res = await signOut();
-    if (res?.message === "退出成功") {
+    if (res?.code == 0) {
       setUser({
         email: "",
         role: "user",
       });
-      toast.success("退出成功");
+      toast.success(res.message);
     }
   };
 
