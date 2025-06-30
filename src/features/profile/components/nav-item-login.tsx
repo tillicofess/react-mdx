@@ -10,28 +10,20 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
-import { useAtom } from "jotai";
-import { authAtom } from "@/hooks/auth";
-import { signOut } from "@/firebase/auth";
 import { toast } from "sonner";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function NavItemLogin() {
   const navigate = useNavigate();
-  const [user, setUser] = useAtom(authAtom);
+  const { customUser, signOut } = useAuth();
 
   const handleLogIn = () => {
     navigate("/login");
   };
 
   const handleLogOut = async () => {
-    const res = await signOut();
-    if (res?.code == 0) {
-      setUser({
-        email: "",
-        role: "user",
-      });
-      toast.success(res.message);
-    }
+    await signOut();
+    toast.success("退出成功");
   };
 
   const navigateToBackend = () => {
@@ -45,8 +37,8 @@ export default function NavItemLogin() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {user.email ? (
-          <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+        {customUser?.email ? (
+          <DropdownMenuLabel>{customUser.email}</DropdownMenuLabel>
         ) : (
           <DropdownMenuLabel>shadcn</DropdownMenuLabel>
         )}
@@ -56,7 +48,7 @@ export default function NavItemLogin() {
           <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {user.email ? (
+        {customUser?.email ? (
           <DropdownMenuItem onSelect={handleLogOut}>Log out</DropdownMenuItem>
         ) : (
           <DropdownMenuItem onSelect={handleLogIn}>Log in</DropdownMenuItem>

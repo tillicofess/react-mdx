@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import Header from "@/features/profile/header";
 import Accordions from "@/features/profile/components/accordion";
 import { TeckStack } from "@/features/profile/components/teck-stack";
 import Blog from "@/features/blog/components";
-import { getUserInfo } from "@/firebase/auth";
-import { useAtom } from "jotai";
-import { authAtom } from "@/hooks/auth";
+import { useAuth } from "@/providers/AuthProvider";
 
 function Pattern() {
   return (
@@ -21,30 +18,9 @@ function Pattern() {
 }
 
 function App() {
-  const [user, setUser] = useAtom(authAtom);
-  const hasFetchedRef = useRef(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { customUser } = useAuth();
 
-  useEffect(() => {
-    setIsLoading(true);
-    console.log("user", user);
-    const init = async () => {
-      if (hasFetchedRef.current || user?.email) return;
-
-      hasFetchedRef.current = true;
-      const fetchedUser = await getUserInfo();
-      if (fetchedUser?.email) {
-        setUser({ email: fetchedUser.email, role: fetchedUser.role || "user" });
-      }
-    };
-
-    init();
-    setIsLoading(false);
-  }, [user, setUser]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  console.log(customUser);
 
   return (
     <div className="max-w-screen overflow-x-hidden">
