@@ -5,6 +5,8 @@ import axios, {
 } from "axios";
 
 import { getApiConfig, isDevelopment } from "../config/env";
+import { getAuth } from "firebase/auth";
+import { toast } from "sonner";
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
@@ -21,11 +23,31 @@ const instance: AxiosInstance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(
-  (config) => {
+  async (config) => {
     // 在发送请求之前做些什么
     if (isDevelopment) {
       console.log("🚀 Request sent:", config.method?.toUpperCase(), config.url);
     }
+
+    const requiresAuth = config?.headers?.requiresAuth;
+
+    // 如果不需要身份验证，就跳过加 token
+    if (!requiresAuth) {
+      return config;
+    }
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      const idToken = await user.getIdToken();
+      config.headers.Authorization = `Bearer ${idToken}`;
+    } else {
+      toast("请先登录");
+    }
+
+    // 移除自定义字段，避免发送到后端
+    delete config.headers.requiresAuth;
     return config;
   },
   (error) => {
@@ -50,28 +72,6 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // 超出 2xx 范围的状态码都会触发该函数
-    // if (isDevelopment) {
-    //   console.error(
-    //     "❌ Response error:",
-    //     error.response?.status,
-    //     error.response?.data
-    //   );
-    // }
-
-    // // 统一错误处理
-    // if (error.response?.status === 401) {
-    //   // 未授权，可以跳转到登录页
-    //   console.warn("Unauthorized access - redirecting to login");
-    //   // window.location.href = '/login';
-    // } else if (error.response?.status === 403) {
-    //   // 禁止访问
-    //   console.warn("Access forbidden");
-    // } else if (error.response?.status >= 500) {
-    //   // 服务器错误
-    //   console.error("Server error");
-    // }
-
     return Promise.reject(error);
   }
 );

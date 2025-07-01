@@ -39,12 +39,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [customUser, setCustomUser] = useState<CustomUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchCustomUser = async (user: FirebaseUser) => {
+  const fetchCustomUser = async () => {
     try {
-      const token = await user.getIdToken();
       const res = await api.get<CustomUser>("/sso/getUserInfo", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          requiresAuth: true,
         },
       });
       setCustomUser(res.data);
@@ -74,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const init = async () => {
       if (firebaseUser) {
-        await fetchCustomUser(firebaseUser);
+        await fetchCustomUser();
       }
     };
     init();

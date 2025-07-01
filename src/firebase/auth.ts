@@ -49,15 +49,12 @@ export const signUpWithCredentials = async (
       password
     );
 
-    const user = userCredential.user;
-    const idToken = await user.getIdToken();
-
     await api.post(
       "/sso/register",
       {},
       {
         headers: {
-          Authorization: `Bearer ${idToken}`,
+          requiresAuth: true,
         },
       }
     );
