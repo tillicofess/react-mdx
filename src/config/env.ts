@@ -9,13 +9,13 @@ export const mode = import.meta.env.MODE;
 export const API_CONFIG = {
   // 开发环境配置
   development: {
-    baseURL: "/api", // 使用 Vite 代理
+    baseURL: "", // 使用 Vite 代理
     timeout: 15000,
     withCredentials: true,
   },
   // 生产环境配置
   production: {
-    baseURL: "https://ticscreek.top/test", // 直接使用域名
+    baseURL: "https://blog.ticscreek.top/", // 直接使用域名
     timeout: 15000, // 生产环境可以设置更长的超时时间
     withCredentials: true,
   },

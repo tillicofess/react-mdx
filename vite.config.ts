@@ -15,22 +15,19 @@ export default defineConfig({
     },
   },
   server: {
+    host: 'dev.ticscreek.top', // 让 Vite 监听这个域名
+    port: 5173, // 确保端口号一致
+    https: {
+      // 使用 mkcert 生成的本地证书
+      key: path.resolve(__dirname, 'dev.ticscreek.top-key.pem'), // 替换为你的私钥文件路径
+      cert: path.resolve(__dirname, 'dev.ticscreek.top.pem'), // 替换为你的证书文件路径
+    },
     proxy: {
       "/api": {
-        target: "https://ticscreek.top",
+        target: "https://blog.ticscreek.top",
         changeOrigin: true,
-        secure: true, // 本地开发使用 HTTP
-        cookieDomainRewrite: "localhost", // 重写 cookie 的 domain 为 localhost
-        rewrite: (path) => path.replace(/^\/api/, "/test"), // 根据实际接口路径调整
-        // configure: (proxy) => {
-        //   proxy.on("proxyRes", (proxyRes, req, res) => {
-        //     const cookies = proxyRes.headers["set-cookie"];
-        //     if (cookies) {
-        //       // 打印 set-cookie 头
-        //       console.log("Set-Cookie from backend:", cookies);
-        //     }
-        //   });
-        // },
+        secure: false, // 允许代理到 HTTPS 目标，但忽略证书验证 (因为是生产环境，这里通常设为true，除非有自签名证书)
+        cookieDomainRewrite: "dev.ticscreek.top",
         agent: httpProxyAgent,
       },
     },

@@ -3,7 +3,7 @@ import Header from "@/features/profile/header";
 import Accordions from "@/features/profile/components/accordion";
 import { TeckStack } from "@/features/profile/components/teck-stack";
 import Blog from "@/features/blog/components";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider copy";
 
 function Pattern() {
   return (
@@ -18,9 +18,8 @@ function Pattern() {
 }
 
 function App() {
-  const { customUser } = useAuth();
-
-  console.log(customUser);
+  const { userInfo } = useAuth();
+  console.log(userInfo);
 
   return (
     <div className="max-w-screen overflow-x-hidden">

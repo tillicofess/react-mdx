@@ -72,6 +72,25 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
+    // 任何超出 2xx 范围的状态码都会触发这个函数
+    // 检查错误响应的状态码
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      console.log("收到 401/403 响应，将重定向到 Authelia 登录页...");
+      // 获取 Authelia 提供的重定向 URL
+      // Nginx 在 401 时会将 Authelia 提供的 Location 头传递给 Axios
+      const redirectionUrl = error.response.headers['location'] || 'https://auth.ticscreek.top';
+
+      // 添加 `rd` 参数以在登录成功后返回当前页面
+      const currentUrl = encodeURIComponent(window.location.href);
+      const finalRedirectionUrl = `${redirectionUrl}?rd=${currentUrl}`;
+
+      // 执行页面跳转
+      window.location.href = finalRedirectionUrl;
+
+      // 阻止 Promise 继续向下传递错误，因为我们已经处理了重定向
+      return new Promise(() => { }); // 返回一个永远不会 resolve/reject 的 Promise
+    }
+    // 对于其他错误，继续向下传递
     return Promise.reject(error);
   }
 );

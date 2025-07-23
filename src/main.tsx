@@ -4,7 +4,7 @@ import "./index.css";
 import { RouterProvider } from "react-router";
 import { router } from "./router.ts";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/providers/AuthProvider";
+import { AuthProvider } from "@/providers/AuthProvider copy.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
