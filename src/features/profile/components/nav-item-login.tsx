@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { CircleUserRound } from "lucide-react";
 import {
@@ -11,19 +11,22 @@ import {
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider copy";
 
 export default function NavItemLogin() {
-  const navigate = useNavigate();
-  const { customUser, signOut } = useAuth();
+  const { userInfo, login, logout } = useAuth();
 
   const handleLogIn = () => {
-    navigate("/login");
+    login();
   };
 
   const handleLogOut = async () => {
-    await signOut();
-    toast.success("退出成功");
+    try {
+      await logout();
+      toast.success("退出成功");
+    } catch (error: any) {
+      toast.error("退出失败:" + error.message);
+    }
   };
 
   const navigateToBackend = () => {
@@ -37,8 +40,8 @@ export default function NavItemLogin() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {customUser?.email ? (
-          <DropdownMenuLabel>{customUser.email}</DropdownMenuLabel>
+        {userInfo?.username ? (
+          <DropdownMenuLabel>{userInfo.username}</DropdownMenuLabel>
         ) : (
           <DropdownMenuLabel>shadcn</DropdownMenuLabel>
         )}
@@ -48,7 +51,7 @@ export default function NavItemLogin() {
           <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {customUser?.email ? (
+        {userInfo?.username ? (
           <DropdownMenuItem onSelect={handleLogOut}>Log out</DropdownMenuItem>
         ) : (
           <DropdownMenuItem onSelect={handleLogIn}>Log in</DropdownMenuItem>
