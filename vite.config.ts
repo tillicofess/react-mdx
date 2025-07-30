@@ -32,4 +32,8 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    sourcemap: true,
+    outDir: 'dist',
+  }
 });

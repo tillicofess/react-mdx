@@ -2,11 +2,13 @@ import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosResponse,
+  type AxiosError
 } from "axios";
 
 import { getApiConfig, isDevelopment } from "../config/env";
 import { getAuth } from "firebase/auth";
 import { toast } from "sonner";
+import { reportError } from "@/utils/errorReporter";
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
@@ -60,21 +62,19 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
-    // 2xx 范围内的状态码都会触发该函数
     if (isDevelopment) {
-      console.log(
-        "✅ Response received:",
-        response.status,
-        response.config.url
-      );
+      console.log("✅ Response received:", response.status, response.config.url);
       console.log("Response data:", response.data);
     }
     return response;
   },
-  (error) => {
-    // 任何超出 2xx 范围的状态码都会触发这个函数
-    // 对于 401/403，现在我们只打印信息，然后正常抛出错误
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+  (error: AxiosError) => {
+    const url = error.config?.url ?? 'Unknown URL';
+    const method = error.config?.method?.toUpperCase() ?? 'UNKNOWN_METHOD';
+    const status = error.response?.status ?? 'NO_STATUS';
+    reportError(`接口错误： ${method} ${url} ${error.message} ${status}`);
+
+    if (status === 401 || status === 403) {
       console.warn("收到 401/403 响应。将在需要时由特定函数处理重定向。");
     }
     // 对于所有错误，继续向下传递

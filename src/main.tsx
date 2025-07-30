@@ -6,6 +6,15 @@ import { router } from "./router.ts";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/providers/AuthProvider copy.tsx";
 import { AbilityProvider } from "./providers/AbilityProvider";
+import { setupUserBehaviorListeners } from "@/monitoring/setupListeners";
+import { breadcrumb } from "@/utils/breadcrumb";
+import { eventBus } from "@/utils/eventBus";
+import { reportError } from "@/utils/errorReporter";
+
+setupUserBehaviorListeners();
+
+eventBus.on("click", (data: any) => breadcrumb.push(data));
+eventBus.on("route", (data: any) => breadcrumb.push(data));
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -18,13 +27,38 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>
 );
 
-// 上报错误（错误处理最后防线）
-window.onerror = function (message, source, lineno, colno, error) {
-  console.error("捕获 JS 错误:", { message, source, lineno, colno, error });
-  // 可上传日志平台（如 Sentry）
-};
+window.addEventListener(
+  'error',
+  (event) => {
+    const target = event.target as HTMLElement;
 
-window.onunhandledrejection = function (event) {
-  console.error("捕获未处理的 Promise 错误:", event.reason);
+    // 判断是否为资源加载错误
+    if (
+      target &&
+      (target.tagName === 'IMG' ||
+        target.tagName === 'SCRIPT' ||
+        target.tagName === 'LINK')
+    ) {
+      reportError(`资源加载失败：${target.tagName} ${(target as any).src || (target as any).href}`);
+    } else {
+      // JS 运行时错误
+      const errorEvent = event as ErrorEvent;
+
+      if (errorEvent.error instanceof Error) {
+        // 有原始 Error 对象 → 最佳情况
+        reportError(errorEvent.error);
+      } else {
+        // 没有 error 对象 → 构造一个
+        const syntheticError = new Error(errorEvent.message);
+        syntheticError.stack = `at ${errorEvent.filename}:${errorEvent.lineno}:${errorEvent.colno}`;
+        reportError(syntheticError);
+      }
+    }
+  },
+  true // 必须 true 才能捕获资源加载错误
+);
+
+window.onunhandledrejection = function (event: PromiseRejectionEvent) {
+  reportError(event.reason);
   // 上报或展示错误提示
 };
