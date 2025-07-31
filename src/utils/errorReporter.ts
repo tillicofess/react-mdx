@@ -2,13 +2,16 @@
 import ErrorStackParser from 'error-stack-parser';
 import { breadcrumb } from './breadcrumb';
 import formatTime from '@/utils/utils';
+import { eventsMatrix } from '@/main';
 
 export function reportError(error: Error | string) {
     setTimeout(() => {
         let structuredError: any = {};
+        let isResourceError = false;
 
         if (typeof error === 'string') {
             structuredError.message = error;
+            isResourceError = true;
         } else {
             structuredError.message = error.message;
 
@@ -26,14 +29,27 @@ export function reportError(error: Error | string) {
             }
         }
 
+
+        let events: any[] = [];
+        if (!isResourceError) {
+            const len = eventsMatrix.length;
+            if (len > 2) {
+                events = eventsMatrix[len - 2].concat(eventsMatrix[len - 1]);
+            } else {
+                events = eventsMatrix[len - 1] || [];
+            }
+        }
+
+        console.log('events', events);
+
         const payload = {
             error: structuredError,
             actions: breadcrumb.getStack(),
+            events,
             time: formatTime(new Date()),
         };
 
         console.log('上报错误:', payload);
-        localStorage.clear()
         localStorage.setItem('errorList', JSON.stringify(payload))
     }, 1000);
 }

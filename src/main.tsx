@@ -10,6 +10,24 @@ import { setupUserBehaviorListeners } from "@/monitoring/setupListeners";
 import { breadcrumb } from "@/utils/breadcrumb";
 import { eventBus } from "@/utils/eventBus";
 import { reportError } from "@/utils/errorReporter";
+import * as rrweb from 'rrweb';
+import type { eventWithTime } from "@rrweb/types";
+
+export const eventsMatrix: eventWithTime[][] = [[]];
+
+rrweb.record({
+  emit(event, isCheckout) {
+    // isCheckout 是一个标识，告诉你重新制作了快照
+    if (isCheckout) {
+      eventsMatrix.push([]);
+    }
+    const lastEvents = eventsMatrix[eventsMatrix.length - 1];
+    lastEvents.push(event);
+  },
+  packFn: rrweb.pack,
+  checkoutEveryNth: 100, // 每 100 个 event 重新制作快照
+});
+
 
 setupUserBehaviorListeners();
 

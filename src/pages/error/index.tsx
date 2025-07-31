@@ -1,26 +1,22 @@
-// import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-// import { ErrorBoundary } from "react-error-boundary";
 import { http } from "@/lib/axios"
 import { loadSourceMap } from "@/utils/sourceMap";
 import sourceMap from 'source-map-js';
-
-// function ErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
-//     return (
-//         <div role="alert" className="p-4 border border-red-400 bg-red-100 text-red-700 rounded-md">
-//             <p className="font-bold">出错了!</p>
-//             <pre className="whitespace-pre-wrap text-sm mt-2">错误信息: {error.message}</pre>
-//             <Button onClick={resetErrorBoundary} className="mt-4 bg-red-500 hover:bg-red-600 text-white">
-//                 重置应用
-//             </Button>
-//         </div>
-//     );
-// }
+import rrwebPlayer from 'rrweb-player';
+import 'rrweb-player/dist/style.css';
+import * as rrweb from 'rrweb';
 
 export default function ErrorPage() {
+    const playerRef = useRef<HTMLDivElement | null>(null);
 
-    // const [asyncMessage, setAsyncMessage] = useState('');
-    // const [promiseMessage, setPromiseMessage] = useState('');
+    useEffect(() => {
+        return () => {
+            if (playerRef.current) {
+                playerRef.current.innerHTML = "";
+            }
+        };
+    }, []);
 
     const handleCodeError = () => {
         throw new TypeError('模拟同步代码错误');
@@ -103,25 +99,48 @@ export default function ErrorPage() {
         }
     }
 
+    const handlePlayReplay = () => {
+        const errorPayload = JSON.parse(localStorage.getItem("errorList") || "{}");
+        const events = errorPayload.events;
+
+        if (!events || events.length === 0) {
+            console.warn("没有可回放的 rrwebEvents");
+            return;
+        }
+
+        if (playerRef.current) {
+            // 清空旧内容（避免重复渲染）
+            playerRef.current.innerHTML = "";
+
+            // 初始化 rrweb 播放器
+            new rrwebPlayer({
+                target: playerRef.current,
+                props: {
+                    events,
+                    width: 800,
+                    height: 500,
+                    autoPlay: true,
+                    UNSAFE_replayCanvas: true,
+                    unpackFn: rrweb.unpack
+                },
+            });
+        }
+    };
+
     return (
-        // <ErrorBoundary
-        //     FallbackComponent={ErrorFallback}
-        //     onReset={() => {
-        //         setAsyncMessage('');
-        //         setPromiseMessage('');
-        //         console.log('Error Boundary 已重置');
-        //     }}
-        // >
-        <div>
-            <Button variant="outline" onClick={handleCodeError}>同步错误</Button>
-            <Button variant="outline" onClick={handleRenderError}>语法错误</Button>
-            <Button variant="outline" onClick={handleAsyncError}>异步错误</Button>
-            <Button variant="outline" onClick={handlePromiseError}>promise错误</Button>
-            <Button variant="outline" onClick={handleApiError}>接口错误</Button>
-            <Button variant="outline">资源加载错误</Button>
-            <Button variant="outline" onClick={findCodeBySourceMap}>获取源码错误</Button>
-            <img src="https://test.cn/×××.png"></img>
-        </div>
-        // </ErrorBoundary>
+        <>
+            <div>
+                <Button variant="outline" onClick={handleCodeError}>同步错误</Button>
+                <Button variant="outline" onClick={handleRenderError}>语法错误</Button>
+                <Button variant="outline" onClick={handleAsyncError}>异步错误</Button>
+                <Button variant="outline" onClick={handlePromiseError}>promise错误</Button>
+                <Button variant="outline" onClick={handleApiError}>接口错误</Button>
+                <Button variant="outline">资源加载错误</Button>
+                <Button variant="outline" onClick={findCodeBySourceMap}>获取源码错误</Button>
+                <Button variant="outline" onClick={handlePlayReplay}>▶️ 回放用户操作</Button>
+                {/* <img src="https://test.cn/×××.png"></img> */}
+            </div>
+            <div ref={playerRef}></div>
+        </>
     );
 }
