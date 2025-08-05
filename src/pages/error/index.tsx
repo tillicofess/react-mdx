@@ -4,7 +4,6 @@ import { http } from "@/lib/axios"
 import { loadSourceMap } from "@/utils/sourceMap";
 import sourceMap from 'source-map-js';
 import rrwebPlayer from 'rrweb-player';
-import 'rrweb-player/dist/style.css';
 import * as rrweb from 'rrweb';
 
 export default function ErrorPage() {

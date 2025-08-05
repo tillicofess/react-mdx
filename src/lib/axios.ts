@@ -23,6 +23,23 @@ const instance: AxiosInstance = axios.create({
   },
 });
 
+function shouldReport(error: AxiosError): boolean {
+  if (error.config?.url?.includes('/api/logs')) return false;
+
+  const status = error.response?.status;
+  const infraCodes = [520, 521, 522, 523, 524, 525, 526];
+  const skipCodes = [401, 403];
+
+  if (error.code === 'ERR_CANCELED') return false;
+  if (!error.response) return navigator.onLine; // 离线不上报
+
+  if (status && infraCodes.includes(status)) return false;
+  if (status && skipCodes.includes(status)) return false;
+
+  return true;
+}
+
+
 // 请求拦截器
 instance.interceptors.request.use(
   async (config) => {
@@ -69,14 +86,15 @@ instance.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
+    console.error("Response error:", error);
     const url = error.config?.url ?? 'Unknown URL';
     const method = error.config?.method?.toUpperCase() ?? 'UNKNOWN_METHOD';
     const status = error.response?.status ?? 'NO_STATUS';
-    reportError(`接口错误： ${method} ${url} ${error.message} ${status}`);
 
-    if (status === 401 || status === 403) {
-      console.warn("收到 401/403 响应。将在需要时由特定函数处理重定向。");
+    if (shouldReport(error)) {
+      reportError(`接口错误： ${method} ${url} ${error.message} ${status}`);
     }
+
     // 对于所有错误，继续向下传递
     return Promise.reject(error);
   }

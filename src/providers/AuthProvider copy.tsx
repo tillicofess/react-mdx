@@ -53,7 +53,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await http.post('/api/user/logout');
+      await http.post('/api/user/logout', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
       setUserInfo(null);
     } catch (error) {
       throw error;

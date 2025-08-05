@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router";
-import { router } from "./router.ts";
+import { router } from "./router.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/providers/AuthProvider copy.tsx";
 import { AbilityProvider } from "./providers/AbilityProvider";
@@ -11,6 +11,7 @@ import { breadcrumb } from "@/utils/breadcrumb";
 import { eventBus } from "@/utils/eventBus";
 import { reportError } from "@/utils/errorReporter";
 import * as rrweb from 'rrweb';
+import 'rrweb-player/dist/style.css';
 import type { eventWithTime } from "@rrweb/types";
 
 export const eventsMatrix: eventWithTime[][] = [[]];

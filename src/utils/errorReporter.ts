@@ -3,12 +3,17 @@ import ErrorStackParser from 'error-stack-parser';
 import { breadcrumb } from './breadcrumb';
 import formatTime from '@/utils/utils';
 import { eventsMatrix } from '@/main';
+import { http } from '@/lib/axios';
 
-export function reportError(error: Error | string) {
-    setTimeout(() => {
+const maxRetries = 3;
+
+export function reportError(error: Error | string, retryCount = 0) {
+
+    setTimeout(async () => {
         let structuredError: any = {};
         let isResourceError = false;
 
+        // 判断是否为资源错误
         if (typeof error === 'string') {
             structuredError.message = error;
             isResourceError = true;
@@ -40,8 +45,6 @@ export function reportError(error: Error | string) {
             }
         }
 
-        console.log('events', events);
-
         const payload = {
             error: structuredError,
             actions: breadcrumb.getStack(),
@@ -49,8 +52,26 @@ export function reportError(error: Error | string) {
             time: formatTime(new Date()),
         };
 
-        console.log('上报错误:', payload);
-        localStorage.setItem('errorList', JSON.stringify(payload))
+        try {
+            const response = await http.post('/api/logs', payload);
+            const result = response.data;
+            if (!result.success) {
+                retryCount++;
+                if (retryCount > maxRetries) {
+                    console.warn('Max retries reached, dropping logs');
+                    breadcrumb.clear();
+                    return; // 终止递归调用
+                }
+                const delay = Math.pow(2, retryCount) * 1000;
+                setTimeout(() => {
+                    reportError(error, retryCount);
+                }, delay);
+            } else {
+                breadcrumb.clear();
+            }
+        } catch (e) {
+            console.warn('上报错误失败:', e);
+        }
     }, 1000);
 }
 
