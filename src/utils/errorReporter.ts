@@ -6,8 +6,13 @@ import { eventsMatrix } from '@/main';
 import { http } from '@/lib/axios';
 
 const maxRetries = 3;
+declare const __APP_VERSION__: string;
 
 export function reportError(error: Error | string, retryCount = 0) {
+    // 🚫 开发环境不报错
+    if (process.env.NODE_ENV === 'development') {
+        return;
+    }
 
     setTimeout(async () => {
         let structuredError: any = {};
@@ -50,6 +55,7 @@ export function reportError(error: Error | string, retryCount = 0) {
             actions: breadcrumb.getStack(),
             events,
             time: formatTime(new Date()),
+            version: __APP_VERSION__,
         };
 
         try {
