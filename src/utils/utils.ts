@@ -1,7 +1,7 @@
-import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 function formatTime(date: Date): string {
-    return format(date, 'yyyy-MM-dd HH:mm:ss');
+    return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 }
 
 export default formatTime;
