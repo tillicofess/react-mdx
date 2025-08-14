@@ -6,8 +6,7 @@ import axios, {
 } from "axios";
 
 import { getApiConfig, isDevelopment } from "../config/env";
-import { getAuth } from "firebase/auth";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { reportError } from "@/utils/errorReporter";
 
 // 获取当前环境的 API 配置
@@ -47,26 +46,6 @@ instance.interceptors.request.use(
     if (isDevelopment) {
       console.log("🚀 Request sent:", config.method?.toUpperCase(), config.url);
     }
-
-    const requiresAuth = config?.headers?.requiresAuth;
-
-    // 如果不需要身份验证，就跳过加 token
-    if (!requiresAuth) {
-      return config;
-    }
-
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (user) {
-      const idToken = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${idToken}`;
-    } else {
-      toast("请先登录");
-    }
-
-    // 移除自定义字段，避免发送到后端
-    delete config.headers.requiresAuth;
     return config;
   },
   (error) => {

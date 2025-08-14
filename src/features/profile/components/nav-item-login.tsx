@@ -10,24 +10,27 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthProvider copy";
+import * as Setting from "@/features/auth/Setting";
+
+// import { toast } from "sonner";
+// import { useAuth } from "@/providers/AuthProvider";
 
 export default function NavItemLogin() {
-  const { userInfo, login, logout } = useAuth();
+  // const { userInfo, login, logout } = useAuth();
 
   const handleLogIn = () => {
-    login();
+    const url = Setting.getSigninUrl();
+    Setting.goToLink(url);
   };
 
-  const handleLogOut = async () => {
-    try {
-      await logout();
-      toast.success("退出成功");
-    } catch (error: any) {
-      toast.error("退出失败:" + error.message);
-    }
-  };
+  // const handleLogOut = async () => {
+  //   try {
+  //     await logout();
+  //     toast.success("退出成功");
+  //   } catch (error: any) {
+  //     toast.error("退出失败:" + error.message);
+  //   }
+  // };
 
   const navigateToBackend = () => {
     window.open("https://ticscreek.top");
@@ -40,22 +43,22 @@ export default function NavItemLogin() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {userInfo?.username ? (
+        {/* {userInfo?.username ? (
           <DropdownMenuLabel>{userInfo.username}</DropdownMenuLabel>
-        ) : (
-          <DropdownMenuLabel>shadcn</DropdownMenuLabel>
-        )}
+        ) : ( */}
+        <DropdownMenuLabel>shadcn</DropdownMenuLabel>
+        {/* )} */}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={navigateToBackend}>
           Backend
           <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {userInfo?.username ? (
+        {/* {userInfo?.username ? (
           <DropdownMenuItem onSelect={handleLogOut}>Log out</DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onSelect={handleLogIn}>Log in</DropdownMenuItem>
-        )}
+        ) : ( */}
+        <DropdownMenuItem onSelect={handleLogIn}>Log in</DropdownMenuItem>
+        {/* )} */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

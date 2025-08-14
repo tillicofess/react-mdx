@@ -1,94 +1,77 @@
 // 1. React imports
 import { createContext, useContext, useEffect, useState } from "react";
-
-// 2. Firebase SDK
-import {
-  getAuth,
-  onAuthStateChanged,
-  type User as FirebaseUser,
-} from "firebase/auth";
-
-// 3. 你自己封装的 axios 请求器
-import { api } from "@/lib/axios";
-
-// 4. 类型定义：自定义用户
-type CustomUser = {
-  email: string;
-  role: string;
-};
+import { http } from "@/lib/axios";
+import { type CustomUser } from "@/types/auth";
 
 // 5. 上下文类型（给 TS 提示用）
 type AuthContextType = {
-  firebaseUser: FirebaseUser | null;
-  customUser: CustomUser | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
-  fetchCustomUser: (user: FirebaseUser) => Promise<void>;
+  userInfo: CustomUser | null;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
-  firebaseUser: null,
-  customUser: null,
-  loading: true,
-  signOut: async () => {},
-  fetchCustomUser: async () => {},
+  userInfo: null,
+  login: async () => { },
+  logout: async () => { }
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
-  const [customUser, setCustomUser] = useState<CustomUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<CustomUser | null>(null);
 
-  const fetchCustomUser = async () => {
+  const init = async function () {
     try {
-      const res = await api.get<CustomUser>("/sso/getUserInfo", {
-        headers: {
-          requiresAuth: true,
-        },
+      const response = await http.get('/api/user/profile');
+      setUserInfo({
+        username: response.data.username,
+        groups: response.data.groups,
       });
-      setCustomUser(res.data);
-    } catch (err) {
-      console.error("获取用户信息失败", err);
-      setCustomUser(null);
-    }
-  };
-
-  // 初始化
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setFirebaseUser(user);
+      console.log('用户已登录:', response.data.username);
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        console.log('用户未登录或会话过期，userInfo 设置为 null。');
+        setUserInfo(null);
       } else {
-        setFirebaseUser(null);
-        setCustomUser(null);
+        console.error('获取用户资料时发生其他错误:', error);
+        setUserInfo(null);
       }
-      setLoading(false);
-    });
+    }
+  }
 
-    return () => unsubscribe();
-  }, []);
+  const login = async () => {
+    // 这是 Authelia 的认证域名
+    const autheliaAuthUrl = 'https://auth.ticscreek.top';
+    // 获取 Authelia 提供的重定向 URL（可选，如果你的 Nginx 不会返回 Location 头，就直接用固定的）
+    const redirectionUrl = autheliaAuthUrl; // 直接使用 Authelia 域名
 
-  // 初始化自定义用户
+    // 添加 `rd` 参数以在登录成功后返回当前页面
+    const currentUrl = encodeURIComponent(window.location.href);
+    const finalRedirectionUrl = `${redirectionUrl}?rd=${currentUrl}`;
+
+    window.location.href = finalRedirectionUrl; // 执行页面跳转
+  }
+
+  const logout = async () => {
+    try {
+      await http.post('/api/user/logout', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      setUserInfo(null);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   useEffect(() => {
-    const init = async () => {
-      if (firebaseUser) {
-        await fetchCustomUser();
-      }
-    };
-    init();
-  }, [firebaseUser]);
-
-  const signOut = async () => {
-    const auth = getAuth();
-    await auth.signOut();
-    setFirebaseUser(null);
-    setCustomUser(null);
-  };
+    init(); // 组件挂载时执行初始化检查
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ firebaseUser, customUser, loading, signOut, fetchCustomUser }}
+      value={{ userInfo, login, logout }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,6 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
-import { useAuth } from '@/providers/AuthProvider copy';
+import { useAuth } from '@/providers/AuthProvider';
 import { type CustomUser } from '@/types/auth';
 
 // 1. 定义创建 Ability 实例的函数 (从你的代码中提取)
