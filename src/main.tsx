@@ -26,7 +26,7 @@ rrweb.record({
     lastEvents.push(event);
   },
   packFn: rrweb.pack,
-  checkoutEveryNth: 100, // 每 100 个 event 重新制作快照
+  checkoutEveryNth: 50, // 每 50 个 event 重新制作快照
 });
 
 
