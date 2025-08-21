@@ -59,7 +59,7 @@ export default defineConfig({
         target: "https://blog.ticscreek.top",
         changeOrigin: true,
         secure: false, // 允许代理到 HTTPS 目标，但忽略证书验证 (因为是生产环境，这里通常设为true，除非有自签名证书)
-        cookieDomainRewrite: "dev.ticscreek.top",
+        // cookieDomainRewrite: "dev.ticscreek.top",
         agent: httpProxyAgent,
       },
     },

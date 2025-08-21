@@ -4,14 +4,14 @@ import Blog from "./pages/blog/blog.tsx";
 import BlogDetail from "./pages/blog/blogDetail.tsx";
 import DetailLayout from "./pages/blog/layout.tsx";
 import ErrorPage from "./pages/error/index.tsx";
-import AuthCallback from "./features/auth/index.tsx";
+// import AuthCallback from "./features/auth/index.tsx";
 
 
 export const router = createBrowserRouter([
-  {
-    path: "/callback",
-    Component: AuthCallback,
-  },
+  // {
+  //   path: "/callback",
+  //   Component: AuthCallback,
+  // },
   {
     path: "/",
     Component: App,

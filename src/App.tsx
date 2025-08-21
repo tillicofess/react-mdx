@@ -3,7 +3,6 @@ import Header from "@/features/profile/header";
 import Accordions from "@/features/profile/components/accordion";
 import { TeckStack } from "@/features/profile/components/teck-stack";
 import Blog from "@/features/blog/components";
-import { Can } from "@/lib/casl";
 
 function Pattern() {
   return (
@@ -77,14 +76,6 @@ function App() {
 
         <Blog />
         <Pattern />
-
-        <Can I="manage" a="all">
-          <button>Delete</button>
-        </Can>
-
-        <Can I="read" a="all">
-          <button>Read</button>
-        </Can>
       </div>
     </div>
   );

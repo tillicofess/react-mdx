@@ -1,4 +1,4 @@
-export type CustomUser = {
-  username: string;
-  groups: string[];
+export type User = {
+  name: string;
+  roles: string[];
 };

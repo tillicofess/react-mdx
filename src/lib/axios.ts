@@ -4,10 +4,10 @@ import axios, {
   type AxiosResponse,
   type AxiosError
 } from "axios";
-
+import { refreshAccessToken, isRefreshRequest } from "@/apis/casdoor";
 import { getApiConfig, isDevelopment } from "../config/env";
-// import { toast } from "sonner";
 import { reportError } from "@/utils/errorReporter";
+import { toast } from 'sonner'
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
@@ -38,7 +38,6 @@ function shouldReport(error: AxiosError): boolean {
   return true;
 }
 
-
 // 请求拦截器
 instance.interceptors.request.use(
   async (config) => {
@@ -57,11 +56,25 @@ instance.interceptors.request.use(
 
 // 响应拦截器
 instance.interceptors.response.use(
-  (response: AxiosResponse) => {
+  async (response: AxiosResponse) => {
     if (isDevelopment) {
       console.log("✅ Response received:", response.status, response.config.url);
       console.log("Response data:", response.data);
     }
+
+    // 无感刷新 token
+    if (response.data.code === 401 && !isRefreshRequest(response.config)) {
+      // 刷新 token
+      const isSuccess = await refreshAccessToken()
+      if (!isSuccess) {
+        toast.error('你没有当前权限，请先登录！或联系管理员')
+        return response;
+      }
+      // 刷新成功，重新请求
+      const resp = await instance.request(response.config)
+      return resp;
+    }
+
     return response;
   },
   (error: AxiosError) => {

@@ -1,14 +1,14 @@
 import { useMemo, type ReactNode } from 'react';
 import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
 import { useAuth } from '@/providers/AuthProvider';
-import { type CustomUser } from '@/types/auth';
+import { type User } from '@/types/auth';
 
 // 1. 定义创建 Ability 实例的函数 (从你的代码中提取)
 // 通常这个函数会放在一个单独的工具文件中，例如 src/lib/ability.ts
-function defineAbilityFor(user: CustomUser | null): MongoAbility { // user 可以是 null
+function defineAbilityFor(user: User | null): MongoAbility { // user 可以是 null
     const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 
-    if (user?.groups?.includes('admins')) {
+    if (user?.roles?.includes('admins')) {
         can('manage', 'all'); // read-write access to everything
     } else {
         can('read', 'all'); // read-only access to everything

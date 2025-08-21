@@ -1,4 +1,3 @@
-// import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { CircleUserRound } from "lucide-react";
 import {
@@ -10,28 +9,26 @@ import {
   DropdownMenuTrigger,
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import * as Setting from "@/features/auth/Setting";
-
-// import { toast } from "sonner";
-// import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function NavItemLogin() {
-  // const { userInfo, login, logout } = useAuth();
+  const { userInfo, signOut } = useAuth();
 
-  const handleLogIn = () => {
+  // 登录
+  const handleSignIn = () => {
     const url = Setting.getSigninUrl();
     Setting.goToLink(url);
   };
 
-  // const handleLogOut = async () => {
-  //   try {
-  //     await logout();
-  //     toast.success("退出成功");
-  //   } catch (error: any) {
-  //     toast.error("退出失败:" + error.message);
-  //   }
-  // };
+  // 退出
+  const handleLogOut = async () => {
+    signOut();
+    toast.success("退出成功");
+  };
 
+  // 进入后台
   const navigateToBackend = () => {
     window.open("https://ticscreek.top");
   };
@@ -43,22 +40,22 @@ export default function NavItemLogin() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {/* {userInfo?.username ? (
-          <DropdownMenuLabel>{userInfo.username}</DropdownMenuLabel>
-        ) : ( */}
-        <DropdownMenuLabel>shadcn</DropdownMenuLabel>
-        {/* )} */}
+        {userInfo?.name ? (
+          <DropdownMenuLabel>{userInfo.name}</DropdownMenuLabel>
+        ) : (
+          <DropdownMenuLabel>shadcn</DropdownMenuLabel>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={navigateToBackend}>
           Backend
           <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {/* {userInfo?.username ? (
-          <DropdownMenuItem onSelect={handleLogOut}>Log out</DropdownMenuItem>
-        ) : ( */}
-        <DropdownMenuItem onSelect={handleLogIn}>Log in</DropdownMenuItem>
-        {/* )} */}
+        {userInfo?.name ? (
+          <DropdownMenuItem onSelect={handleLogOut}>Sign out</DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onSelect={handleSignIn}>Sign in</DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

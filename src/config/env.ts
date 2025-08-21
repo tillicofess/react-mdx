@@ -4,13 +4,15 @@
 export const isDevelopment = import.meta.env.DEV;
 export const isProduction = import.meta.env.PROD;
 export const mode = import.meta.env.MODE;
+export const token = localStorage.getItem('token') || '';
+
 
 // API 配置
 export const API_CONFIG = {
   // 开发环境配置
   development: {
     baseURL: "", // 使用 Vite 代理
-    timeout: 15000,
+    timeout: 150000,
     withCredentials: true,
   },
   // 生产环境配置

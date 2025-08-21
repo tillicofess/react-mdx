@@ -2,14 +2,12 @@ import Sdk from "casdoor-js-sdk";
 
 export const ServerUrl = "https://blog.ticscreek.top";
 
-
 const sdkConfig = {
     serverUrl: "https://auth.ticscreek.top",
-    clientId: "8ee311f6728aa06c0a95",
+    clientId: "27af7d8ad24441bc8fac",
     appName: "blog",
-    organizationName: "organization_bt380i",
-    redirectPath: "/callback",
-    signinPath: "/api/user/signin",
+    organizationName: "blog",
+    redirectPath: "https://blog.ticscreek.top/api/user/callback",
 };
 
 export const CasdoorSDK = new Sdk(sdkConfig);
@@ -34,8 +32,8 @@ export function getMyResourcesUrl(account: any) {
     return CasdoorSDK.getMyProfileUrl(account).replace("/account?", "/resources?");
 }
 
-export function signin(serverUrl: any) {
-    return CasdoorSDK.signin(serverUrl);
+export function signin() {
+    return CasdoorSDK.signin(ServerUrl);
 }
 
 // export function showMessage(type: any, text: any) {
@@ -52,3 +50,12 @@ export function signin(serverUrl: any) {
 export function goToLink(link: any) {
     window.location.href = link;
 }
+
+export async function getUserInfo(token: string) {
+    return await CasdoorSDK.getUserInfo(token);
+}
+
+export async function refreshAccessToken(refreshToken: string) {
+    return await CasdoorSDK.refreshAccessToken(refreshToken);
+}
+
