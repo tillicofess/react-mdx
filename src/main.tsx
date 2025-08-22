@@ -36,14 +36,14 @@ eventBus.on("click", (data: any) => breadcrumb.push(data));
 eventBus.on("route", (data: any) => breadcrumb.push(data));
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <AuthProvider>
       <AbilityProvider>
       <Toaster />
       <RouterProvider router={router} />
       </AbilityProvider>
     </AuthProvider>
-  </StrictMode>
+  // </StrictMode>
 );
 
 window.addEventListener(

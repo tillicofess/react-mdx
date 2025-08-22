@@ -4,7 +4,7 @@ import axios, {
   type AxiosResponse,
   type AxiosError
 } from "axios";
-import { refreshAccessToken, isRefreshRequest } from "@/apis/casdoor";
+import { refreshAccessToken, isRefreshRequest, isGetUserInfoRequest } from "@/apis/casdoor";
 import { getApiConfig, isDevelopment } from "../config/env";
 import { reportError } from "@/utils/errorReporter";
 import { toast } from 'sonner'
@@ -67,7 +67,10 @@ instance.interceptors.response.use(
       // 刷新 token
       const isSuccess = await refreshAccessToken()
       if (!isSuccess) {
-        toast.error('你没有当前权限，请先登录！或联系管理员')
+        // 博客不强制要求登录，刷新失败时不提示
+        if (!isGetUserInfoRequest(response.config)) {
+          toast.error('你没有当前权限，请先登录！或联系管理员')
+        }
         return response;
       }
       // 刷新成功，重新请求

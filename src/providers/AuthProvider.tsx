@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { type User } from "@/types/auth";
-import { http } from "@/lib/axios"
+import { getUserInfo } from "@/apis/casdoor"
 
 const AuthContext = createContext({
   userInfo: null as User | null,
@@ -18,21 +18,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoggedIn(true);
     });
 
+    // 获取用户信息
     async function getInfo() {
-      let res = await http.get('/api/user/userinfo');
-      console.log(res);
+      let res = await getUserInfo();
+      console.log(res.data);
       return res.data;
     }
 
+    // 设置用户信息
     function setInfo(res: any) {
-      let userInfo = res;
+      let userInfo = res.data.user;
       setUserInfo({
         name: userInfo.name,
+        avatar: userInfo.avatar,
+        email: userInfo.email,
         roles: userInfo.roles,
       });
     }
   }, []);
 
+  // 退出登录
   function signOut() {
     setUserInfo(null);
     setIsLoggedIn(false);

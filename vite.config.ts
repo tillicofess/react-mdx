@@ -47,7 +47,7 @@ export default defineConfig({
     },
   },
   server: {
-    host: 'dev.ticscreek.top', // 让 Vite 监听这个域名
+    host: 'dev.ticscreek.top',
     port: 5173, // 确保端口号一致
     https: {
       // 使用 mkcert 生成的本地证书
