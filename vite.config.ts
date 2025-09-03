@@ -3,13 +3,12 @@ import path from "path";
 import fs from 'fs'
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { HttpsProxyAgent } from "https-proxy-agent";
+// import { HttpsProxyAgent } from "https-proxy-agent";
 
-const httpProxyAgent = new HttpsProxyAgent("http://127.0.0.1:7890");
+// const httpProxyAgent = new HttpsProxyAgent("http://127.0.0.1:7890");
 const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'))
 const version = `v${pkg.version}`
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(),
   {
@@ -47,23 +46,27 @@ export default defineConfig({
     },
   },
   server: {
-    host: 'dev.ticscreek.top',
-    port: 5173, // 确保端口号一致
-    https: {
-      // 使用 mkcert 生成的本地证书
-      key: path.resolve(__dirname, 'dev.ticscreek.top-key.pem'), // 替换为你的私钥文件路径
-      cert: path.resolve(__dirname, 'dev.ticscreek.top.pem'), // 替换为你的证书文件路径
-    },
-    proxy: {
-      "/api": {
-        target: "https://blog.ticscreek.top",
-        changeOrigin: true,
-        secure: false, // 允许代理到 HTTPS 目标，但忽略证书验证 (因为是生产环境，这里通常设为true，除非有自签名证书)
-        // cookieDomainRewrite: "dev.ticscreek.top",
-        agent: httpProxyAgent,
-      },
-    },
+    host: '127.0.0.1',
+    port: 4000
   },
+  // server: {
+  //   host: 'dev.ticscreek.top',
+  //   port: 5173, // 确保端口号一致
+  //   https: {
+  //     // 使用 mkcert 生成的本地证书
+  //     key: path.resolve(__dirname, 'dev.ticscreek.top-key.pem'), // 替换为你的私钥文件路径
+  //     cert: path.resolve(__dirname, 'dev.ticscreek.top.pem'), // 替换为你的证书文件路径
+  //   },
+  //   proxy: {
+  //     "/api": {
+  //       target: "https://blog.ticscreek.top",
+  //       changeOrigin: true,
+  //       secure: false, // 允许代理到 HTTPS 目标，但忽略证书验证 (因为是生产环境，这里通常设为true，除非有自签名证书)
+  //       // cookieDomainRewrite: "dev.ticscreek.top",
+  //       agent: httpProxyAgent,
+  //     },
+  //   },
+  // },
   build: {
     sourcemap: true,
     outDir: 'dist',

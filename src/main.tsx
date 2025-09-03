@@ -1,11 +1,11 @@
-import { StrictMode } from "react";
+// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router";
 import { router } from "./router.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/providers/AuthProvider.tsx";
-import { AbilityProvider } from "@/providers/AbilityProvider.tsx";
+// import { AbilityProvider } from "@/providers/AbilityProvider.tsx";
 import { setupUserBehaviorListeners } from "@/monitoring/setupListeners";
 import { breadcrumb } from "@/utils/breadcrumb";
 import { eventBus } from "@/utils/eventBus";
@@ -37,12 +37,12 @@ eventBus.on("route", (data: any) => breadcrumb.push(data));
 
 createRoot(document.getElementById("root")!).render(
   // <StrictMode>
-    <AuthProvider>
-      <AbilityProvider>
-      <Toaster />
-      <RouterProvider router={router} />
-      </AbilityProvider>
-    </AuthProvider>
+  <AuthProvider>
+    {/* <AbilityProvider> */}
+    <Toaster />
+    <RouterProvider router={router} />
+    {/* </AbilityProvider> */}
+  </AuthProvider>
   // </StrictMode>
 );
 

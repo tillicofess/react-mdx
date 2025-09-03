@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { http } from "@/lib/axios";
-import { refreshAccessToken } from "@/apis/casdoor";
+// import { refreshAccessToken } from "@/apis/ory";
 
 
 export default function ErrorPage() {
@@ -71,49 +71,10 @@ export default function ErrorPage() {
         <Button variant="outline" onClick={handleApiError}>接口错误</Button>
         <Button variant="outline">资源加载错误</Button>
         <Button variant="outline" onClick={handleGetUserInfo}>测试token刷新接口</Button>
-        <Button variant="outline" onClick={async () => {
+        {/* <Button variant="outline" onClick={async () => {
           await refreshAccessToken()
-        }}>刷新token</Button>
+        }}>刷新token</Button> */}
       </div>
     </>
   );
 }
-
-// import * as Setting from "@/features/auth/Setting";
-// import { SilentSignin, isSilentSigninRequired } from "casdoor-react-sdk";
-
-// function HomePage() {
-//   const isLoggedIn = () => {
-//     return localStorage.getItem("token") !== null;
-//   };
-
-//   if (isSilentSigninRequired()) {
-//     // if the `silentSignin` parameter exists, perform silent login processing
-//     return (
-//       <SilentSignin
-//         sdk={Setting.CasdoorSDK}
-//         isLoggedIn={isLoggedIn}
-//         handleReceivedSilentSigninSuccessEvent={() => {
-//           // jump to the home page here and clear silentSignin parameter
-//           window.location.href = "/";
-//         }}
-//         handleReceivedSilentSigninFailureEvent={() => {
-//           // prompt the user to log in failed here
-//           alert("login failed");
-//         }}
-//       />
-//     );
-//   }
-
-//   const renderContent = () => {
-//     if (isLoggedIn()) {
-//       return <div>Hello!</div>;
-//     } else {
-//       return <div>you are not logged in</div>;
-//     }
-//   };
-
-//   return renderContent();
-// }
-
-// export default HomePage;

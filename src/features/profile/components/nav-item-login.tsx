@@ -10,16 +10,15 @@ import {
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import * as Setting from "@/features/auth/Setting";
 import { useAuth } from "@/providers/AuthProvider";
+import { login } from "@/apis/ory";
 
 export default function NavItemLogin() {
   const { userInfo, signOut } = useAuth();
 
   // 登录
   const handleSignIn = () => {
-    const url = Setting.getSigninUrl();
-    Setting.goToLink(url);
+    login();
   };
 
   // 退出

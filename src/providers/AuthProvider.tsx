@@ -1,46 +1,48 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { type User } from "@/types/auth";
-import { getUserInfo } from "@/apis/casdoor"
+import { getUserInfo, logout } from "@/apis/ory"
 
 const AuthContext = createContext({
   userInfo: null as User | null,
   isLoggedIn: false,
+  state: "",
   signOut: () => { },
 })
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [state] = useState("");
 
   useEffect(() => {
     getInfo().then(res => {
       setInfo(res as any);
-      setIsLoggedIn(true);
     });
 
     // 获取用户信息
     async function getInfo() {
       let res = await getUserInfo();
-      console.log(res.data);
-      return res.data;
+      return res;
     }
 
     // 设置用户信息
     function setInfo(res: any) {
-      let userInfo = res.data.user;
-      setUserInfo({
-        name: userInfo.name,
-        avatar: userInfo.avatar,
-        email: userInfo.email,
-        roles: userInfo.roles,
-      });
+      if (res != null) {
+        setUserInfo({
+          email: res.email,
+          name: `${res.name.first}${res.name.last}`,
+        });
+        setIsLoggedIn(true);
+      } else {
+        setUserInfo(null);
+        setIsLoggedIn(false);
+      }
     }
   }, []);
 
   // 退出登录
   function signOut() {
-    setUserInfo(null);
-    setIsLoggedIn(false);
+    logout();
   }
 
   return (
@@ -48,6 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         userInfo,
         isLoggedIn,
+        state,
         signOut,
       }}
     >
