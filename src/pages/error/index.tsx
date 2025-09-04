@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { http } from "@/lib/axios";
-// import { refreshAccessToken } from "@/apis/ory";
+import { reFreshToken } from "@/apis/ory";
 
 
 export default function ErrorPage() {
@@ -51,10 +51,19 @@ export default function ErrorPage() {
     }
   }
 
-  const handleGetUserInfo = async () => {
+  const handleRefreshToken = async () => {
     try {
-      let res = await http.get('/api/user/userinfo');
-      console.log(res.data);
+      await reFreshToken();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const protectApiTest = async () => {
+    try {
+      await http.get('http://127.0.0.1:3001/protect/test', {
+        withCredentials: true,
+      });
     } catch (e) {
       console.log(e);
     }
@@ -70,10 +79,8 @@ export default function ErrorPage() {
         <Button variant="outline" onClick={handlePromiseError}>promise错误</Button>
         <Button variant="outline" onClick={handleApiError}>接口错误</Button>
         <Button variant="outline">资源加载错误</Button>
-        <Button variant="outline" onClick={handleGetUserInfo}>测试token刷新接口</Button>
-        {/* <Button variant="outline" onClick={async () => {
-          await refreshAccessToken()
-        }}>刷新token</Button> */}
+        <Button variant="outline" onClick={handleRefreshToken}>刷新token</Button>
+        <Button variant="outline" onClick={protectApiTest}>测试保护接口</Button>
       </div>
     </>
   );

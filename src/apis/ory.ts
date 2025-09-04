@@ -26,7 +26,7 @@ import { http } from "@/lib/axios"
 export const login = () => {
     const state = Math.random().toString(36).substring(2, 10);
     const params = new URLSearchParams({
-        client_id: "8e89d61b-f523-4dbf-8805-d62a983d48bf",
+        client_id: "68f98473-1547-4d84-9015-e838e743c872",
         response_type: "code",
         scope: "openid profile email offline_access",
         redirect_uri: "http://127.0.0.1:4000/callback",
@@ -38,6 +38,22 @@ export const login = () => {
     // 跳转到 hydra public /oauth2/auth
     window.location.href = `http://127.0.0.1:4444/oauth2/auth?${params.toString()}`;
 };
+
+export const reFreshToken = async () => {
+    const data = {
+        grant_type: "refresh_token",
+        scope: "openid profile email offline_access",
+        client_id: "68f98473-1547-4d84-9015-e838e743c872",
+    }
+
+    const resp = await http.post("http://127.0.0.1:3001/token", data, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        withCredentials: true,
+    });
+    return resp.data.code === 200;
+}
 
 export const getUserInfo = async () => {
     try {

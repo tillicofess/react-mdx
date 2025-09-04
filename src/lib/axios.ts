@@ -4,10 +4,10 @@ import axios, {
   type AxiosResponse,
   type AxiosError
 } from "axios";
-// import { refreshAccessToken, isRefreshRequest, isGetUserInfoRequest } from "@/apis/casdoor";
+import { reFreshToken } from "@/apis/ory";
 import { getApiConfig, isDevelopment } from "../config/env";
 import { reportError } from "@/utils/errorReporter";
-// import { toast } from 'sonner'
+import { toast } from 'sonner'
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
@@ -63,20 +63,17 @@ instance.interceptors.response.use(
     }
 
     // 无感刷新 token
-    // if (response.data.code === 401 && !isRefreshRequest(response.config)) {
-    //   // 刷新 token
-    //   const isSuccess = await refreshAccessToken()
-    //   if (!isSuccess) {
-    //     // 博客不强制要求登录，刷新失败时不提示
-    //     if (!isGetUserInfoRequest(response.config)) {
-    //       toast.error('你没有当前权限，请先登录！或联系管理员')
-    //     }
-    //     return response;
-    //   }
-    //   // 刷新成功，重新请求
-    //   const resp = await instance.request(response.config)
-    //   return resp;
-    // }
+    if (response.data.code === 401) {
+      // 刷新 token
+      const isSuccess = await reFreshToken()
+      if (!isSuccess) {
+        // 博客不强制要求登录，刷新失败时不提示
+        toast.error('你没有当前权限，请先登录！或联系管理员')
+        return response;
+      }
+      const resp = await instance.request(response.config)
+      return resp;
+    }
 
     return response;
   },

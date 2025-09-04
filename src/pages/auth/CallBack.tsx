@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { Spinner } from "@/components/ui/spinner";
 
 function Callback() {
     const params = new URLSearchParams(window.location.search);
@@ -38,8 +39,11 @@ function Callback() {
         }
     }, [code]);
     return (
-        <div>
-            <h1>正在登录中...</h1>
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            <div className="flex flex-col items-center gap-4 p-8 rounded-lg bg-background shadow-md">
+                <Spinner size="lg" className="text-primary" />
+                <p className="text-lg font-medium">正在登录中，请稍候...</p>
+            </div>
         </div>
     );
 }
