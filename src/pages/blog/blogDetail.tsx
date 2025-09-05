@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { ChevronLeftIcon } from "lucide-react";
 import { Link } from "react-router";
 import dayjs from "dayjs";
-
-import { loadMDXFile, parseFrontmatter } from "@/utils/mdxLoader";
+import { loadMDXFromBackend, parseFrontmatter } from "@/utils/mdxLoader";
+import { getCachedMDX, setCachedMDX } from "@/utils/mdxCache";
 import MDXRenderer from "@/components/MDXRenderer";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/typography";
@@ -19,15 +19,27 @@ function BlogDetail() {
     const loadContent = async () => {
       try {
         setError(null);
-        const rawContent = await loadMDXFile(slug || "");
+        // 从缓存中获取内容
+        const cached = getCachedMDX(slug as string);
+        if (cached) {
+          setFrontmatter(cached.frontmatter);
+          setMdxContent(cached.content);
+          return;
+        }
+
+        // 从后端加载内容
+        const rawContent = await loadMDXFromBackend(slug as string);
+
+        // 解析frontmatter
         const { frontmatter: fm, content } = parseFrontmatter(rawContent);
 
-        setFrontmatter(fm);
+        setFrontmatter(fm as Record<string, any>);
         setMdxContent(content);
+
+        setCachedMDX(slug as string, { frontmatter: fm as Record<string, any>, content });
       } catch (err) {
         console.error("Error loading MDX content:", err);
         setError(err instanceof Error ? err.message : "Failed to load content");
-      } finally {
       }
     };
 
@@ -45,39 +57,6 @@ function BlogDetail() {
 
   return (
     <>
-      {/* {frontmatter.title && (
-        <div
-          style={{
-            maxWidth: "800px",
-            margin: "0 auto 2rem",
-            padding: "1rem",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "0.5rem",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <h2 style={{ margin: "0 0 0.5rem", color: "#495057" }}>文档信息</h2>
-          <p>
-            <strong>标题:</strong> {frontmatter.title}
-          </p>
-          {frontmatter.description && (
-            <p>
-              <strong>描述:</strong> {frontmatter.description}
-            </p>
-          )}
-          {frontmatter.createdAt && (
-            <p>
-              <strong>创建时间:</strong> {frontmatter.createdAt}
-            </p>
-          )}
-          {frontmatter.updatedAt && (
-            <p>
-              <strong>更新时间:</strong> {frontmatter.updatedAt}
-            </p>
-          )}
-        </div>
-      )} */}
-
       <div className="screen-line-after flex pb-4">
         <Button variant="link" className="px-2 text-base" asChild>
           <Link to="/blog">

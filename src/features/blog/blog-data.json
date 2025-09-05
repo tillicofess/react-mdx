@@ -30,5 +30,13 @@
       "image": "/blog/writing-effect-inspired-by-apple-1.webp",
       "createdAt": "2022-04-26"
     }
+  },
+  {
+    "slug": "example",
+    "metadata": {
+      "title": "Example",
+      "image": "/blog/awesome-terminal-1.webp",
+      "createdAt": "2022-04-26"
+    }
   }
 ]
