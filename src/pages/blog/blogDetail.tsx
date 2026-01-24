@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeftIcon } from "lucide-react";
 import { Link } from "react-router";
 import dayjs from "dayjs";
-import { loadMDXFromBackend, parseFrontmatter } from "@/utils/mdxLoader";
+import { parseFrontmatter, loadMDXFromBackend } from "@/utils/mdxLoader";
 import { getCachedMDX, setCachedMDX } from "@/utils/mdxCache";
 import MDXRenderer from "@/components/MDXRenderer";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,7 @@ function BlogDetail() {
         </div>
 
         <div>
-          <MDXRenderer mdxContent={mdxContent} />
+          <MDXRenderer slug={slug as string} mdxContent={mdxContent} />
         </div>
       </Prose>
     </>

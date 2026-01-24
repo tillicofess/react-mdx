@@ -1,4 +1,5 @@
 // src/utils/breadcrumb.ts
+// 记录错误上传前用户行为
 import formatTime from '@/utils/utils';
 
 export class Breadcrumb {

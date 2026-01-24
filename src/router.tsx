@@ -1,15 +1,22 @@
 import { createBrowserRouter } from "react-router";
+import { lazy, Suspense } from "react";
+
+// 使用动态导入提高首屏性能
 import App from "./App.tsx";
-import Blog from "./pages/blog/blog.tsx";
-import BlogDetail from "./pages/blog/blogDetail.tsx";
-import DetailLayout from "./pages/blog/layout.tsx";
-import ErrorPage from "./pages/error/index.tsx";
-import Callback from "./pages/auth/CallBack.tsx";
+const Blog = lazy(() => import("./pages/blog/blog.tsx"));
+const BlogDetail = lazy(() => import("./pages/blog/blogDetail.tsx"));
+const DetailLayout = lazy(() => import("./pages/blog/layout.tsx"));
+const ErrorPage = lazy(() => import("./pages/error/index.tsx"));
+const Callback = lazy(() => import("./pages/auth/CallBack.tsx"));
 
 export const router = createBrowserRouter([
   {
     path: "/callback",
-    Component: Callback,
+    element: (
+      <Suspense fallback={<div>Loading Callback...</div>}>
+        <Callback />
+      </Suspense>
+    ),
   },
   {
     path: "/",
@@ -20,17 +27,28 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/blog",
-        Component: Blog,
+        element: (
+          <Suspense fallback={<div>Loading Blog...</div>}>
+            <Blog />
+          </Suspense>
+        ),
       },
       {
         path: "/blog/:slug",
-        Component: BlogDetail,
+        element: (
+          <Suspense fallback={<div>Loading Blog Detail...</div>}>
+            <BlogDetail />
+          </Suspense>
+        ),
       },
       {
         path: "/error",
-        Component: ErrorPage,
+        element: (
+          <Suspense fallback={<div>Loading Error Page...</div>}>
+            <ErrorPage />
+          </Suspense>
+        ),
       },
     ],
   },
-
 ]);

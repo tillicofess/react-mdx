@@ -1,44 +1,20 @@
 import { defineConfig } from "vite";
 import path from "path";
-import fs from 'fs'
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-// import { HttpsProxyAgent } from "https-proxy-agent";
-
-// const httpProxyAgent = new HttpsProxyAgent("http://127.0.0.1:7890");
-const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'))
-const version = `v${pkg.version}`
+import { visualizer } from 'rollup-plugin-visualizer';
+import { viteExternalsPlugin } from 'vite-plugin-externals';
 
 export default defineConfig({
   plugins: [react(), tailwindcss(),
-  {
-    name: 'move-sourcemaps-to-versioned-folder',
-    closeBundle() {
-      const distPath = path.resolve(__dirname, 'dist')
-      const jsPath = path.join(distPath, 'js')
-      const mapPath = path.join(distPath, `${version}_map`)
-
-      if (!fs.existsSync(mapPath)) {
-        fs.mkdirSync(mapPath)
-      }
-
-      const files = fs.readdirSync(jsPath)
-
-      files.forEach((file) => {
-        if (file.endsWith('.map')) {
-          const from = path.join(jsPath, file)
-          const to = path.join(mapPath, file) // ✅ 不加版本号前缀
-          fs.renameSync(from, to)
-        }
-      })
-
-      console.log(`✔️ Source maps moved to ${version}_map/`)
-    },
-  },
+  visualizer({
+    open: true,
+    filename: 'dist/stats.html',
+  }),
+  viteExternalsPlugin({
+    axios: 'axios',
+  }),
   ],
-  define: {
-    __APP_VERSION__: JSON.stringify(version), // 👈 注入全局常量
-  },
   assetsInclude: ["**/*.mdx"], // 将MDX文件作为静态资源处理
   resolve: {
     alias: {
@@ -46,8 +22,7 @@ export default defineConfig({
     },
   },
   server: {
-    host: '127.0.0.1',
-    port: 4000
+    port: 5173
   },
   // server: {
   //   host: 'dev.ticscreek.top',
@@ -67,15 +42,20 @@ export default defineConfig({
   //     },
   //   },
   // },
+  // build: {
+  //   sourcemap: true,
+  //   outDir: 'dist',
+  //   rollupOptions: {
+  //     output: {
+  //       entryFileNames: `js/[name].[hash].js`,
+  //       chunkFileNames: `js/[name].[hash].js`,
+  //       assetFileNames: `assets/[name].[hash].[ext]`,
+  //     },
+  //   },
+  // },
   build: {
-    sourcemap: true,
-    outDir: 'dist',
     rollupOptions: {
-      output: {
-        entryFileNames: `js/[name].[hash].js`,
-        chunkFileNames: `js/[name].[hash].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`,
-      },
+      treeshake: true,
     },
-  },
+  }
 });

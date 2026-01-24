@@ -1,8 +1,8 @@
-import { http } from "@/lib/axios"
+import { request } from "@/lib/axios"
 // import type { AxiosRequestConfig } from "axios";
 
 // export async function getUserInfo() {
-//     const resp = await http.get('/api/user/userinfo', {
+//     const resp = await request.get('/api/user/userinfo', {
 //         __isGetUserInfo: true
 //     });
 //     return resp;
@@ -46,7 +46,7 @@ export const reFreshToken = async () => {
         client_id: "68f98473-1547-4d84-9015-e838e743c872",
     }
 
-    const resp = await http.post("http://127.0.0.1:3001/token", data, {
+    const resp = await request.post("http://127.0.0.1:3001/user/token", data, {
         headers: {
             "Content-Type": "application/json",
         },
@@ -57,7 +57,7 @@ export const reFreshToken = async () => {
 
 export const getUserInfo = async () => {
     try {
-        const response = await http.get("http://127.0.0.1:3001/whoami", {
+        const response = await request.get("http://127.0.0.1:3001/user/whoami", {
             withCredentials: true,
         });
 
@@ -74,7 +74,11 @@ export const getUserInfo = async () => {
 
 export const logout = async () => {
     try {
-        const response = await http.get("http://127.0.0.1:4433/self-service/logout/browser", {
+        const client_id = "68f98473-1547-4d84-9015-e838e743c872";
+        await request.post("http://127.0.0.1:3001/user/logout", {
+            client_id,
+        }, { withCredentials: true });
+        const response = await request.get("http://127.0.0.1:4433/self-service/logout/browser", {
             withCredentials: true,
         });
 
@@ -86,3 +90,17 @@ export const logout = async () => {
         console.error("Logout request failed:", error);
     }
 };
+
+export const introspect = async () => {
+    try {
+        const client_id = "68f98473-1547-4d84-9015-e838e743c872";
+        const res = await request.post('http://127.0.0.1:3001/user/introspect', {
+            client_id,
+        }, {
+            withCredentials: true,
+        });
+        return res.data.data;
+    } catch (e) {
+        console.log(e);
+    }
+}

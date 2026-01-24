@@ -1,5 +1,5 @@
 export const USER = {
-  photoURL: "/avatar.png",
+  photoURL: "/avatar.jpg",
   displayName: "Till Confess",
   flipSentences: [
     "path '/' creacted by ssg",

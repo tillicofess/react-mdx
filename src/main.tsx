@@ -1,18 +1,15 @@
-// import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router";
 import { router } from "./router.tsx";
-import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/providers/AuthProvider.tsx";
-// import { AbilityProvider } from "@/providers/AbilityProvider.tsx";
 import { setupUserBehaviorListeners } from "@/monitoring/setupListeners";
 import { breadcrumb } from "@/utils/breadcrumb";
 import { eventBus } from "@/utils/eventBus";
 import { reportError } from "@/utils/errorReporter";
 import * as rrweb from 'rrweb';
 import 'rrweb-player/dist/style.css';
-import type { eventWithTime } from "@rrweb/types";
+import { type eventWithTime } from "@rrweb/types";
+import { type MonitorError } from "@/types/monitor";
 
 export const eventsMatrix: eventWithTime[][] = [[]];
 
@@ -26,58 +23,72 @@ rrweb.record({
     lastEvents.push(event);
   },
   packFn: rrweb.pack,
-  checkoutEveryNth: 50, // 每 50 个 event 重新制作快照
+  checkoutEveryNth: 30, // 每 30 个 event 重新制作快照
 });
 
 
 setupUserBehaviorListeners();
 
+// 订阅点击、路由变化事件
 eventBus.on("click", (data: any) => breadcrumb.push(data));
 eventBus.on("route", (data: any) => breadcrumb.push(data));
 
 createRoot(document.getElementById("root")!).render(
-  // <StrictMode>
-  <AuthProvider>
-    {/* <AbilityProvider> */}
-    <Toaster />
-    <RouterProvider router={router} />
-    {/* </AbilityProvider> */}
-  </AuthProvider>
-  // </StrictMode>
+  <RouterProvider router={router} />
 );
 
+// 处理 JS 运行时错误
+window.onerror = function (msg, source, lineno, colno, error) {
+  reportError({
+    category: 'js',
+    type: error?.name || 'Error',
+    message: String(msg),
+    stack: error?.stack,
+    fileName: source,
+    line: lineno,
+    column: colno
+  } as MonitorError)
+}
+
+// 处理 Promise 未捕获拒绝错误
+window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+  const reason = event.reason;
+
+  if (reason instanceof Error) {
+    reportError({
+      category: 'promise',
+      type: reason.name,
+      message: reason.message,
+      stack: reason.stack
+    });
+  } else {
+    reportError({
+      category: 'promise',
+      type: 'PromiseError',
+      message: String(reason)
+    });
+  }
+});
+
+// 处理 资源 | DOM 错误
 window.addEventListener(
   'error',
-  (event) => {
-    const target = event.target as HTMLElement;
+  (event: Event) => {
+    const target = event.target as any;
 
-    // 判断是否为资源加载错误
-    if (
-      target &&
-      (target.tagName === 'IMG' ||
-        target.tagName === 'SCRIPT' ||
-        target.tagName === 'LINK')
-    ) {
-      reportError(`资源加载失败：${target.tagName} ${(target as any).src || (target as any).href}`);
-    } else {
-      // JS 运行时错误
-      const errorEvent = event as ErrorEvent;
-
-      if (errorEvent.error instanceof Error) {
-        // 有原始 Error 对象 → 最佳情况
-        reportError(errorEvent.error);
-      } else {
-        // 没有 error 对象 → 构造一个
-        const syntheticError = new Error(errorEvent.message);
-        syntheticError.stack = `at ${errorEvent.filename}:${errorEvent.lineno}:${errorEvent.colno}`;
-        reportError(syntheticError);
-      }
+    // 忽略 JS 运行时错误
+    if (event instanceof ErrorEvent) {
+      return;
     }
+
+    reportError({
+      category: 'resource',
+      type: 'ResourceError',
+      message: `资源加载失败: ${target.tagName}`,
+      url: target.src || target.href,
+      tagName: target.tagName
+    });
   },
-  true // 必须 true 才能捕获资源加载错误
+  true // 捕获阶段，才能拿到资源错误
 );
 
-window.onunhandledrejection = function (event: PromiseRejectionEvent) {
-  reportError(event.reason);
-  // 上报或展示错误提示
-};

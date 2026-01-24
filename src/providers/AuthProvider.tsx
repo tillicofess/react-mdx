@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { type User } from "@/types/auth";
-import { getUserInfo, logout } from "@/apis/ory"
+import { getUserInfo, logout, introspect } from "@/apis/ory"
 
 const AuthContext = createContext({
   userInfo: null as User | null,
@@ -15,9 +15,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state] = useState("");
 
   useEffect(() => {
-    getInfo().then(res => {
-      setInfo(res as any);
-    });
+    introspect().then(res => {
+      setIsLoggedIn(res);
+    })
+  }, [])
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      getInfo().then(res => {
+        setInfo(res as any);
+      });
+    }
 
     // 获取用户信息
     async function getInfo() {
@@ -38,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoggedIn(false);
       }
     }
-  }, []);
+  }, [isLoggedIn]);
 
   // 退出登录
   function signOut() {

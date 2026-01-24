@@ -1,83 +1,45 @@
-// src/utils/errorReporter.ts
-import ErrorStackParser from 'error-stack-parser';
+// 错误上报
 import { breadcrumb } from './breadcrumb';
 import formatTime from '@/utils/utils';
 import { eventsMatrix } from '@/main';
-import { http } from '@/lib/axios';
+import { request } from '@/lib/axios';
+import { type MonitorError } from '@/types/monitor';
 
-const maxRetries = 3;
-declare const __APP_VERSION__: string;
+const APP_VERSION = import.meta.env.VITE_APP_VERSION;
+export const REPORT_URL = '/api/logs';
 
-export function reportError(error: Error | string, retryCount = 0) {
-    // 🚫 开发环境不报错
-    if (process.env.NODE_ENV === 'development') {
-        return;
+export async function reportError(error: MonitorError) {
+    // 🚫 开发环境不上报
+    // if (process.env.NODE_ENV === 'development') return;
+
+    // 资源错误不需要录制用户行为录像
+    const needEvents = error.category !== 'resource';
+    
+    let events: any[] = [];
+
+    if (needEvents) {
+        const len = eventsMatrix.length;
+        if (len >= 2) {
+            events = eventsMatrix[len - 2].concat(eventsMatrix[len - 1]);
+        } else {
+            events = eventsMatrix[len - 1] || [];
+        }
     }
 
-    setTimeout(async () => {
-        let structuredError: any = {};
-        let isResourceError = false;
+    const payload = {
+        error,
+        actions: breadcrumb.getStack(),
+        events,
+        time: formatTime(new Date()),
+        version: APP_VERSION,
+    };
 
-        // 判断是否为资源错误
-        if (typeof error === 'string') {
-            structuredError.message = error;
-            isResourceError = true;
-        } else {
-            structuredError.message = error.message;
-
-            try {
-                const stackFrames = ErrorStackParser.parse(error);
-                if (stackFrames.length > 0) {
-                    const top = stackFrames[0];
-                    structuredError.fileName = top.fileName;
-                    structuredError.line = top.lineNumber;
-                    structuredError.column = top.columnNumber;
-                    structuredError.functionName = top.functionName;
-                }
-            } catch (e) {
-                console.warn('解析堆栈失败:', e);
-            }
-        }
-
-
-        let events: any[] = [];
-        if (!isResourceError) {
-            const len = eventsMatrix.length;
-            if (len > 2) {
-                events = eventsMatrix[len - 2].concat(eventsMatrix[len - 1]);
-            } else {
-                events = eventsMatrix[len - 1] || [];
-            }
-        }
-
-        const payload = {
-            error: structuredError,
-            actions: breadcrumb.getStack(),
-            events,
-            time: formatTime(new Date()),
-            version: __APP_VERSION__,
-        };
-
-        try {
-            const response = await http.post('/api/logs', payload);
-            const result = response.data;
-            if (!result.success) {
-                retryCount++;
-                if (retryCount > maxRetries) {
-                    console.warn('Max retries reached, dropping logs');
-                    breadcrumb.clear();
-                    return; // 终止递归调用
-                }
-                const delay = Math.pow(2, retryCount) * 1000;
-                setTimeout(() => {
-                    reportError(error, retryCount);
-                }, delay);
-            } else {
-                breadcrumb.clear();
-            }
-        } catch (e) {
-            console.warn('上报错误失败:', e);
-        }
-    }, 1000);
+    try {
+        await request.post('https://api.ticscreek.top/errorLogs/create', payload);
+    } catch (e) {
+        console.warn('错误上报失败:', e);
+    } finally {
+        breadcrumb.clear();
+    }
 }
 

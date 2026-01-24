@@ -15,8 +15,10 @@ function Callback() {
     }
     useEffect(() => {
         if (code) {
+            const redirect_uri = "http://127.0.0.1:4000/callback";
+            const client_id = "68f98473-1547-4d84-9015-e838e743c872";
             // 交换 code 为 token
-            fetch("http://127.0.0.1:3001/exchange", {
+            fetch("http://127.0.0.1:3001/user/exchange", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -24,6 +26,8 @@ function Callback() {
                 body: JSON.stringify({
                     code,
                     state,
+                    redirect_uri,
+                    client_id,
                 }),
                 credentials: "include",
             })

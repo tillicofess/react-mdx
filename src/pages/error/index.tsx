@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { http } from "@/lib/axios";
+import { request } from "@/lib/axios";
 import { reFreshToken } from "@/apis/ory";
 
 
@@ -45,7 +45,7 @@ export default function ErrorPage() {
   // 示例5: 接口错误 (try...catch 需在异步操作内部)
   const handleApiError = async () => {
     try {
-      await http.get('/api/null');
+      await request.get('/api/null');
     } catch (e) {
       console.log(e);
     }
@@ -61,9 +61,23 @@ export default function ErrorPage() {
 
   const protectApiTest = async () => {
     try {
-      await http.get('http://127.0.0.1:3001/protect/test', {
+      await request.get('http://127.0.0.1:3001/user/protect/test', {
         withCredentials: true,
       });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const getUserInfo = async () => {
+    try {
+      const client_id = "68f98473-1547-4d84-9015-e838e743c872";
+      const res = await request.post('http://127.0.0.1:3001/user/userinfo', {
+        client_id,
+      }, {
+        withCredentials: true,
+      });
+      console.log(res);
     } catch (e) {
       console.log(e);
     }
@@ -81,6 +95,7 @@ export default function ErrorPage() {
         <Button variant="outline">资源加载错误</Button>
         <Button variant="outline" onClick={handleRefreshToken}>刷新token</Button>
         <Button variant="outline" onClick={protectApiTest}>测试保护接口</Button>
+        <Button variant="outline" onClick={getUserInfo}>获取用户信息</Button>
       </div>
     </>
   );

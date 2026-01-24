@@ -1,22 +1,32 @@
 import React, { useState, useEffect } from "react";
+// 核心依赖
 import { evaluate } from "@mdx-js/mdx";
-import remarkGfm from "remark-gfm";
-import rehypePrettyCode from "rehype-pretty-code";
-import { visit } from "unist-util-visit";
 import { MDXProvider } from "@mdx-js/react";
 import * as runtime from "react/jsx-runtime";
 import * as provider from "@mdx-js/react";
-import { components } from "./MdxComponents";
-import type { Element } from "hast";
-import { Prose } from "@/components/ui/typography";
-import { rehypeNpmCommand } from "@/lib/rehype-npm-command";
+
+// MDX 插件
+import remarkGfm from "remark-gfm";
 import rehypeExternalLinks from "rehype-external-links";
+import { rehypeNpmCommand } from "@/lib/rehype-npm-command";
+import rehypePrettyCode from "rehype-pretty-code";
+
+// AST 工具
+import { visit } from "unist-util-visit";
+import type { Element } from "hast";
+
+// 样式与工具
+import { components } from "./MdxComponents";
+import { Prose } from "@/components/ui/typography";
+import { getCachedMDXComponent, setCachedMDXComponent } from "@/utils/mdxCache";
+
 
 interface MDXRendererProps {
+  slug: string,
   mdxContent: string;
 }
 
-const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
+const MDXRenderer: React.FC<MDXRendererProps> = ({ slug, mdxContent }) => {
   const [MDXContent, setMDXContent] = useState<React.ComponentType | null>(
     null
   );
@@ -27,6 +37,14 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
       try {
         setError(null);
 
+        // 检查缓存中是否已有编译好的组件
+        const cachedComponent = getCachedMDXComponent(slug);
+        if (cachedComponent) {
+          setMDXContent(() => cachedComponent);
+          return;
+        }
+
+        const t0 = performance.now();
         // 使用evaluate方法编译MDX内容
         const { default: Component } = await evaluate(mdxContent, {
           ...provider,
@@ -37,11 +55,12 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
           ],
           // 添加 data-language
           rehypePlugins: [
+            // 自动为外链添加 target/rel 属性
             [
               rehypeExternalLinks,
               { target: "_blank", rel: "nofollow noopener noreferrer" },
             ],
-
+            
             // 提取原始字符串
             () => (tree) => {
               visit(tree, (node) => {
@@ -96,19 +115,21 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ mdxContent }) => {
           ],
           development: false,
         });
-
+        const t1 = performance.now();
+        console.log(`[MDX] compiled ${mdxContent.length} chars in ${(t1 - t0).toFixed(1)} ms`);
+        // 缓存编译后的组件
+        setCachedMDXComponent(slug, Component);
         setMDXContent(() => Component);
       } catch (err) {
         console.error("MDX compilation error:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
       }
     };
 
     if (mdxContent) {
       compileMDX();
     }
-  }, [mdxContent]);
+  }, [slug, mdxContent]);
 
   if (error) {
     return (
