@@ -1,4 +1,3 @@
-// 发布订阅 事件总线
 export class EventBus {
     private events: Record<string, Function[]> = {};
 

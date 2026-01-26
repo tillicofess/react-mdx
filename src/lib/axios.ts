@@ -5,7 +5,6 @@ import axios, {
   type AxiosError
 } from "axios";
 import { getApiConfig, isDevelopment } from "../config/env";
-import { REPORT_URL, reportError } from '@/utils/errorReporter';
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
@@ -25,14 +24,6 @@ const successHandler = (response: AxiosResponse) => {
 };
 
 const errorHandler = (error: AxiosError) => {
-  if (!isDevelopment && !error.config?.url?.includes(REPORT_URL)) {
-    reportError({
-      category: 'http',
-      type: error.name,
-      message: error.message,
-      stack: error.stack,
-    });
-  }
   return Promise.reject(error);
 };
 
