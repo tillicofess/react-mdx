@@ -7,7 +7,7 @@ export class Breadcrumb {
 
   init() {
     const config = getConfig();
-    this.max = config.maxBreadcrumb || 20;
+    this.max = config.maxBreadcrumb;
   }
 
   push(event: any) {

@@ -1,4 +1,5 @@
 import { eventBus } from '../utils/eventBus';
+import { listenRouteChange } from '../utils/router';
 
 let inited = false;
 
@@ -17,19 +18,7 @@ function initRouteListener() {
         });
     };
 
-    const rawPushState = history.pushState;
-    history.pushState = function (...args) {
-        rawPushState.apply(this, args);
-        emitRoute();
-    };
-
-    const rawReplaceState = history.replaceState;
-    history.replaceState = function (...args) {
-        rawReplaceState.apply(this, args);
-        emitRoute();
-    };
-
-    window.addEventListener('popstate', emitRoute);
+    listenRouteChange(emitRoute);
 }
 
 function initClickListener() {

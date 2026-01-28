@@ -15,6 +15,9 @@ export function report(data: any) {
         console.error('[Monitor] reportUrl not configured');
         return;
     }
+    if (config.appName) {
+        data = { ...data, appName: config.appName };
+    }
     const reportData = JSON.stringify(data);
     reportMethod(config.reportUrl, reportData);
 }
@@ -24,13 +27,13 @@ export function xhrRequest(url: string, data: any) {
         window.requestIdleCallback(() => {
             const xhr = new XMLHttpRequest();
             originOpen.call(xhr, 'POST', url, true);
-            originSend.call(xhr, JSON.stringify(data));
+            originSend.call(xhr, data);
         });
     } else {
         setTimeout(() => {
             const xhr = new XMLHttpRequest();
             originOpen.call(xhr, 'POST', url, true);
-            originSend.call(xhr, JSON.stringify(data));
+            originSend.call(xhr, data);
         }, 0);
     }
 }

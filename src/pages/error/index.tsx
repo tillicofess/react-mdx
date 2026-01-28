@@ -30,16 +30,7 @@ export default function ErrorPage() {
   // 示例4: Promise 错误 (window.onunhandledrejection捕获)
   // 如果使用async/await 使得 Promise 的拒绝可以像同步错误一样被 try...catch 捕获。
   const handlePromiseError = () => {
-    try {
-      new Promise<void>((resolve) => {
-        JSON.parse('');
-        resolve();
-      });
-    } catch (err) {
-      // try/catch 不能捕获Promise中错误 ❌
-      console.error('in try catch', err);
-    }
-
+    Promise.reject(new Error('message'))
   }
 
   // 示例5: 接口错误 (try...catch 需在异步操作内部)
@@ -96,6 +87,7 @@ export default function ErrorPage() {
         <Button variant="outline" onClick={handleRefreshToken}>刷新token</Button>
         <Button variant="outline" onClick={protectApiTest}>测试保护接口</Button>
         <Button variant="outline" onClick={getUserInfo}>获取用户信息</Button>
+        <img src="https://xxx,com"></img>
       </div>
     </>
   );

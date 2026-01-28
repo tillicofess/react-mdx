@@ -4,6 +4,9 @@ import { breadcrumb } from '../behavior/store';
 import { report } from '../report';
 import type { MonitorError } from './type';
 import { getConfig } from '../config/index';
+import { formatTime } from '../utils/day';
+
+
 
 let inited = false;
 
@@ -16,9 +19,10 @@ export function initError() {
   eventBus.on('error', (error: MonitorError) => {
     // 3. 组合行为数据
     const payload = {
+      type: 'error',
       error,
       actions: breadcrumb.getStack(),
-      time: Date.now(),
+      time: formatTime(new Date()),
       version: config.version
     };
     // 4. 上报

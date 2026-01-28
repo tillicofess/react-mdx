@@ -1,7 +1,8 @@
 import type { MonitorConfig } from './type';
 
-export const defaultConfig: Partial<MonitorConfig> = {
-  enableError: true,
-  enableBehavior: true,
+export const defaultConfig: Omit<MonitorConfig, 'appName' | 'version' | 'reportUrl'> = {
   maxBreadcrumb: 20,
+  enableError: false,
+  enableBehavior: false,
+  enablePerformance: false,
 };
