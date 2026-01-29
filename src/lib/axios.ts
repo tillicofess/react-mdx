@@ -4,7 +4,7 @@ import axios, {
   type AxiosResponse,
   type AxiosError
 } from "axios";
-import { getApiConfig, isDevelopment } from "../config/env";
+import { getApiConfig } from "../config/env";
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
