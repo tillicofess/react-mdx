@@ -8,13 +8,13 @@ interface CachedMDXContent {
 const mdxContentCache = new Map<string, CachedMDXContent>();
 const mdxComponentCache = new Map<string, ComponentType>();
 
-export const getCachedMDX = (slug: string) => mdxContentCache.get(slug);
-export const setCachedMDX = (slug: string, data: CachedMDXContent) => {
-    mdxContentCache.set(slug, data);
+export const getCachedMDX = (id: string) => mdxContentCache.get(id);
+export const setCachedMDX = (id: string, data: CachedMDXContent) => {
+    mdxContentCache.set(id, data);
 };
 
-export const getCachedMDXComponent = (slug: string) =>
-    mdxComponentCache.get(slug);
+export const getCachedMDXComponent = (id: string) =>
+    mdxComponentCache.get(id);
 
-export const setCachedMDXComponent = (slug: string, comp: ComponentType) =>
-    mdxComponentCache.set(slug, comp);
+export const setCachedMDXComponent = (id: string, comp: ComponentType) =>
+    mdxComponentCache.set(id, comp);

@@ -89,3 +89,5 @@ export const request = {
 
 // 导出 axios 实例，以便需要更复杂配置时使用
 export default instance;
+
+export const fetcher = (url: string) => request.get(url).then(res => res.data.data);

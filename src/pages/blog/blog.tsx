@@ -1,9 +1,12 @@
 import Panel, { PanelHeader, PanelTitle } from "@/features/profile/components/panel";
 import BlogItemLink from "@/features/blog/components/blogItem";
-import blogData from "@/features/blog/blog-data.json";
+import useSWR from "swr";
+import { fetcher } from '@/lib/axios';
+
+
 
 export default function Blog() {
-  const allBlogs = blogData;
+  const { data: allBlogs = [] } = useSWR('/articles/list', fetcher);
   return (
     <Panel id="blog" className="scroll-mt-[1rem]">
       <PanelHeader>
@@ -17,8 +20,8 @@ export default function Blog() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {allBlogs.map((v) => {
-            return <BlogItemLink key={v.slug} blog={v} />;
+          {allBlogs.map((v: any) => {
+            return <BlogItemLink key={v.id} blog={v} />;
           })}
         </div>
       </div>

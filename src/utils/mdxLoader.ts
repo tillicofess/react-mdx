@@ -42,9 +42,9 @@ export const loadMDXFile = async (slug: string): Promise<string> => {
 };
 
 // 从后端加载MDX内容
-export const loadMDXFromBackend = async (slug: string): Promise<string> => {
+export const loadMDXFromBackend = async (id: string): Promise<string> => {
   try {
-    const res = await request.get(`http://localhost:3001/articles/${slug}`);
+    const res = await request.get(`http://localhost:3001/articles/detail/${id}`);
     if (!res.data.data.content) throw new Error("No content received");
     return res.data.data.content;
   } catch (error) {

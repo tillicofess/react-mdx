@@ -11,13 +11,13 @@ export const token = localStorage.getItem('token') || '';
 export const API_CONFIG = {
   // 开发环境配置
   development: {
-    baseURL: "", // 使用 Vite 代理
+    baseURL: "https://api.ticscreek.top",
     timeout: 150000,
     withCredentials: true,
   },
   // 生产环境配置
   production: {
-    baseURL: "https://blog.ticscreek.top/", // 直接使用域名
+    baseURL: "https://api.ticscreek.top",
     timeout: 15000, // 生产环境可以设置更长的超时时间
     withCredentials: true,
   },

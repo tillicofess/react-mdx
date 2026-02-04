@@ -5,6 +5,8 @@ export type BlogLinkType = {
   };
   
   export type BlogType = {
-    metadata: BlogLinkType;
-    slug: string;
+    id: string;
+    cover_image: string;
+    title: string;
+    created_at: string;
   };

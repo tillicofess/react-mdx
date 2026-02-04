@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/typography";
 
 function BlogDetail() {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const [error, setError] = useState<string | null>(null);
   const [mdxContent, setMdxContent] = useState<string>("");
   const [frontmatter, setFrontmatter] = useState<Record<string, any>>({});
@@ -20,7 +20,7 @@ function BlogDetail() {
       try {
         setError(null);
         // 从缓存中获取内容
-        const cached = getCachedMDX(slug as string);
+        const cached = getCachedMDX(id as string);
         if (cached) {
           setFrontmatter(cached.frontmatter);
           setMdxContent(cached.content);
@@ -28,7 +28,7 @@ function BlogDetail() {
         }
 
         // 从后端加载内容
-        const rawContent = await loadMDXFromBackend(slug as string);
+        const rawContent = await loadMDXFromBackend(id as string);
 
         // 解析frontmatter
         const { frontmatter: fm, content } = parseFrontmatter(rawContent);
@@ -36,7 +36,7 @@ function BlogDetail() {
         setFrontmatter(fm as Record<string, any>);
         setMdxContent(content);
 
-        setCachedMDX(slug as string, { frontmatter: fm as Record<string, any>, content });
+        setCachedMDX(id as string, { frontmatter: fm as Record<string, any>, content });
       } catch (err) {
         console.error("Error loading MDX content:", err);
         setError(err instanceof Error ? err.message : "Failed to load content");
@@ -85,7 +85,7 @@ function BlogDetail() {
         </div>
 
         <div>
-          <MDXRenderer slug={slug as string} mdxContent={mdxContent} />
+          <MDXRenderer id={id as string} mdxContent={mdxContent} />
         </div>
       </Prose>
     </>

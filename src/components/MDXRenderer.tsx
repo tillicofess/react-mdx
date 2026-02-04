@@ -22,11 +22,11 @@ import { getCachedMDXComponent, setCachedMDXComponent } from "@/utils/mdxCache";
 
 
 interface MDXRendererProps {
-  slug: string,
+  id: string,
   mdxContent: string;
 }
 
-const MDXRenderer: React.FC<MDXRendererProps> = ({ slug, mdxContent }) => {
+const MDXRenderer: React.FC<MDXRendererProps> = ({ id, mdxContent }) => {
   const [MDXContent, setMDXContent] = useState<React.ComponentType | null>(
     null
   );
@@ -38,7 +38,7 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ slug, mdxContent }) => {
         setError(null);
 
         // 检查缓存中是否已有编译好的组件
-        const cachedComponent = getCachedMDXComponent(slug);
+        const cachedComponent = getCachedMDXComponent(id);
         if (cachedComponent) {
           setMDXContent(() => cachedComponent);
           return;
@@ -118,7 +118,7 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ slug, mdxContent }) => {
         const t1 = performance.now();
         console.log(`[MDX] compiled ${mdxContent.length} chars in ${(t1 - t0).toFixed(1)} ms`);
         // 缓存编译后的组件
-        setCachedMDXComponent(slug, Component);
+        setCachedMDXComponent(id, Component);
         setMDXContent(() => Component);
       } catch (err) {
         console.error("MDX compilation error:", err);
@@ -129,7 +129,7 @@ const MDXRenderer: React.FC<MDXRendererProps> = ({ slug, mdxContent }) => {
     if (mdxContent) {
       compileMDX();
     }
-  }, [slug, mdxContent]);
+  }, [id, mdxContent]);
 
   if (error) {
     return (
