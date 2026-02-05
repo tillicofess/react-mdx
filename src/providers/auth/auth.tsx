@@ -27,6 +27,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | undefined>();
 
   useEffect(() => {
+    keycloak.onAuthLogout = () => {
+      setAuthenticated(false);
+      setToken(undefined);
+      setUser(null);
+    };
+    
     keycloak
       .init({
         onLoad: 'check-sso',

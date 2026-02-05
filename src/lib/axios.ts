@@ -12,6 +12,9 @@ import keycloak from "@/providers/auth/keycloak";
 const MAX_RETRY_LIMIT = 3; // 最大重试次数
 const RETRY_DELAY = 1000;  // 重试延迟（毫秒）
 
+// 2. 刷新 Token 的 Promise 缓存变量 (实现请求合并的关键)
+let refreshPromise: Promise<boolean> | null = null;
+
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
 
@@ -40,20 +43,40 @@ const errorHandler = async (error: AxiosError) => {
     config._retry = true; // 标记该请求已经尝试过刷新 Token
 
     try {
-      // minValidity 30s: 如果 token 还有不到 30s 过期，就去刷新
-      const refreshed = await keycloak.updateToken(30);
+      // 如果当前已经有一个刷新任务在进行，则直接复用它
+      if (!refreshPromise) {
+        refreshPromise = new Promise((resolve, reject) => {
+          // KeycloakPromise 转换为标准 Promise
+          keycloak.updateToken(30)
+            .then((refreshed) => {
+              // 判定标准：要么真的刷新了，要么本地 token 依然可用
+              resolve(refreshed || (!!keycloak.token && !keycloak.isTokenExpired()));
+            })
+            .catch((err) => {
+              reject(err);
+            })
+            .finally(() => {
+              // 任务结束（无论成功失败），必须清空引用，否则下次过期将无法再次刷新
+              refreshPromise = null;
+            });
+        });
+      }
 
-      // 情况 A：刷新成功，或者虽然没请求服务端但当前 Token 依然看起来有效
-      if (refreshed || (keycloak.token && !keycloak.isTokenExpired())) {
+      // 等待刷新任务完成（无论是自己发起的还是“搭便车”的）
+      const isSuccess = await refreshPromise;
+
+      if (isSuccess && keycloak.token) {
+        // 刷新成功，更新 Header 并重新发起本次请求
         config.headers.Authorization = `Bearer ${keycloak.token}`;
         return instance(config);
       }
 
-      // 情况 B：逻辑走到这里说明 updateToken 没能换回新 Token
-      // 且当前本地 Token 依然判定为失效。这时再重试已无意义。
-      return Promise.reject(new Error('Token refresh yielded no valid token'));
+      // 刷新逻辑执行了但没拿到有效 Token
+      keycloak.clearToken();
+      return Promise.reject(new Error('Token refresh failed: No valid token found'));
+
     } catch (refreshError) {
-      // 刷新失败（Refresh Token 也过期了），通常需重定向至登录
+      // 刷新请求过程中报错（如 Refresh Token 也过期了）
       keycloak.clearToken();
       return Promise.reject(refreshError);
     }
