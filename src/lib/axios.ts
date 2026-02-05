@@ -1,10 +1,16 @@
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
+  type InternalAxiosRequestConfig,
   type AxiosResponse,
   type AxiosError
 } from "axios";
 import { getApiConfig } from "../config/env";
+import keycloak from "@/providers/auth/keycloak";
+
+// 1. 配置常量
+const MAX_RETRY_LIMIT = 3; // 最大重试次数
+const RETRY_DELAY = 1000;  // 重试延迟（毫秒）
 
 // 获取当前环境的 API 配置
 const apiConfig = getApiConfig();
@@ -19,24 +25,67 @@ const instance: AxiosInstance = axios.create({
   },
 });
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const successHandler = (response: AxiosResponse) => {
   return response;
 };
 
-const errorHandler = (error: AxiosError) => {
-  return Promise.reject(error);
-};
+const errorHandler = async (error: AxiosError) => {
+  const config = error.config as InternalAxiosRequestConfig;
+  if (!config) return Promise.reject(error);
 
-// 请求拦截器
-instance.interceptors.request.use(
-  (config) => {
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+  // --- 场景 A: 处理 401 Token 过期 (无感刷新) ---
+  if (error.response?.status === 401 && !config._retry) {
+    config._retry = true; // 标记该请求已经尝试过刷新 Token
+
+    try {
+      // minValidity 30s: 如果 token 还有不到 30s 过期，就去刷新
+      const refreshed = await keycloak.updateToken(30);
+
+      // 情况 A：刷新成功，或者虽然没请求服务端但当前 Token 依然看起来有效
+      if (refreshed || (keycloak.token && !keycloak.isTokenExpired())) {
+        config.headers.Authorization = `Bearer ${keycloak.token}`;
+        return instance(config);
+      }
+
+      // 情况 B：逻辑走到这里说明 updateToken 没能换回新 Token
+      // 且当前本地 Token 依然判定为失效。这时再重试已无意义。
+      return Promise.reject(new Error('Token refresh yielded no valid token'));
+    } catch (refreshError) {
+      // 刷新失败（Refresh Token 也过期了），通常需重定向至登录
+      keycloak.clearToken();
+      return Promise.reject(refreshError);
+    }
   }
 
-);
+  // --- 场景 B: 实现通用请求最大重试次数 (针对 5xx 或网络错误) ---
+  // 逻辑：如果是 5xx 错误且未达到重试上限，则自动重试
+  const shouldRetry =
+    !error.response || (error.response.status >= 500 && error.response.status <= 599);
+
+  if (shouldRetry) {
+    config._retryCount = config._retryCount ?? 0;
+
+    if (config._retryCount < MAX_RETRY_LIMIT) {
+      config._retryCount++;
+      console.warn(`请求失败，正在进行第 ${config._retryCount} 次重试...`);
+
+      await sleep(RETRY_DELAY);
+      return instance(config);
+    }
+  }
+
+  return Promise.reject(error);
+}
+
+// 请求拦截器
+instance.interceptors.request.use((config) => {
+  if (keycloak.token) {
+    config.headers.Authorization = `Bearer ${keycloak.token}`;
+  }
+  return config;
+});
 
 // 响应拦截器
 instance.interceptors.response.use(successHandler, errorHandler);

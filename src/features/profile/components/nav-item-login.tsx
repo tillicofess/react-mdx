@@ -10,11 +10,10 @@ import {
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { useAuth } from "@/providers/AuthProvider";
-import { login } from "@/apis/ory";
+import { useAuth } from "@/providers/auth/auth.tsx";
 
 export default function NavItemLogin() {
-  const { userInfo, signOut } = useAuth();
+  const { isAuthenticated, user, login, logout } = useAuth();
 
   // 登录
   const handleSignIn = () => {
@@ -23,7 +22,7 @@ export default function NavItemLogin() {
 
   // 退出
   const handleLogOut = async () => {
-    signOut();
+    logout();
     toast.success("退出成功");
   };
 
@@ -39,8 +38,8 @@ export default function NavItemLogin() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {userInfo?.name ? (
-          <DropdownMenuLabel>{userInfo.name}</DropdownMenuLabel>
+        {isAuthenticated && user?.name ? (
+          <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
         ) : (
           <DropdownMenuLabel>shadcn</DropdownMenuLabel>
         )}
@@ -50,7 +49,7 @@ export default function NavItemLogin() {
           <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {userInfo?.name ? (
+        {isAuthenticated && user?.name ? (
           <DropdownMenuItem onSelect={handleLogOut}>Sign out</DropdownMenuItem>
         ) : (
           <DropdownMenuItem onSelect={handleSignIn}>Sign in</DropdownMenuItem>

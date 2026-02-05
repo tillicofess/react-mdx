@@ -1,14 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
+import 'axios';
 
 declare module 'axios' {
-  export interface AxiosRequestConfig {
-    /**
-     * 标识是否为刷新 token 的请求
-     */
-    __isRefreshToken?: boolean;
-    /**
-     * 标识是否为获取用户信息的请求
-     */
-    __isGetUserInfo?: boolean;
+  export interface InternalAxiosRequestConfig {
+    _retry?: boolean;
+    _retryCount?: number; // 为下一步重试机制做准备
   }
 }
