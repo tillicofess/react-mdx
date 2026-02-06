@@ -8,8 +8,8 @@ import {
   type ReactNode,
 } from 'react';
 import keycloak from './keycloak';
-import { decodeUser, type KeycloakUser } from './user';
-import BouncingLoader from '@/components/ui/gsap-loader';
+import { type KeycloakUser } from './user';
+import BouncingLoader from '@/components/gsap-loader';
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -35,7 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthenticated(true);
       if (keycloak.token) {
         setToken(keycloak.token);
-        setUser(decodeUser(keycloak.token));
+        setUser({
+          sub: keycloak.tokenParsed?.sub || '',
+          preferred_username: keycloak.tokenParsed?.preferred_username || '',
+          email: keycloak.tokenParsed?.email || '',
+          name: keycloak.tokenParsed?.name || '',
+          roles: keycloak.tokenParsed?.resource_access?.['api-backend']?.roles || [],
+        });
       }
     };
     keycloak.onAuthLogout = () => {
@@ -54,7 +60,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (authenticated && keycloak.token) {
           setAuthenticated(true);
           setToken(keycloak.token);
-          setUser(decodeUser(keycloak.token));
+          setUser({
+            sub: keycloak.tokenParsed?.sub || '',
+            preferred_username: keycloak.tokenParsed?.preferred_username || '',
+            email: keycloak.tokenParsed?.email || '',
+            name: keycloak.tokenParsed?.name || '',
+            roles: keycloak.tokenParsed?.resource_access?.['api-backend']?.roles || [],
+          });
         }
         if (exitLoaderRef.current) {
           exitLoaderRef.current();

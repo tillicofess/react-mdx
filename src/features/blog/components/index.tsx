@@ -8,7 +8,6 @@ import { fetcher } from '@/lib/axios';
 
 export default function Blog() {
   const { data: allBlogs = [] } = useSWR('/articles/latest', fetcher);
-  console.log(allBlogs);
   return (
     <Panel id="blog" className="scroll-mt-[1rem]">
       <PanelHeader>

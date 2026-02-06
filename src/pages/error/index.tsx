@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { request } from "@/lib/axios";
-import { reFreshToken } from "@/apis/ory";
 
 
 export default function ErrorPage() {
@@ -42,33 +41,9 @@ export default function ErrorPage() {
     }
   }
 
-  const handleRefreshToken = async () => {
-    try {
-      await reFreshToken();
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   const protectApiTest = async () => {
     try {
-      await request.get('http://127.0.0.1:3001/user/protect/test', {
-        withCredentials: true,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  const getUserInfo = async () => {
-    try {
-      const client_id = "68f98473-1547-4d84-9015-e838e743c872";
-      const res = await request.post('http://127.0.0.1:3001/user/userinfo', {
-        client_id,
-      }, {
-        withCredentials: true,
-      });
-      console.log(res);
+      await request.delete('/api/admin/post/123');
     } catch (e) {
       console.log(e);
     }
@@ -84,10 +59,8 @@ export default function ErrorPage() {
         <Button variant="outline" onClick={handlePromiseError}>promise错误</Button>
         <Button variant="outline" onClick={handleApiError}>接口错误</Button>
         <Button variant="outline">资源加载错误</Button>
-        <Button variant="outline" onClick={handleRefreshToken}>刷新token</Button>
         <Button variant="outline" onClick={protectApiTest}>测试保护接口</Button>
-        <Button variant="outline" onClick={getUserInfo}>获取用户信息</Button>
-        <img src="https://xxx,com"></img>
+        {/* <img src="https://xxx,com"></img> */}
       </div>
     </>
   );

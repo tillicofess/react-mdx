@@ -30,10 +30,20 @@ const instance: AxiosInstance = axios.create({
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// 请求拦截器
+instance.interceptors.request.use((config) => {
+  if (keycloak.token) {
+    config.headers.Authorization = `Bearer ${keycloak.token}`;
+  }
+  return config;
+});
+
+// 响应成功处理
 const successHandler = (response: AxiosResponse) => {
   return response;
 };
 
+// 响应错误处理
 const errorHandler = async (error: AxiosError) => {
   const config = error.config as InternalAxiosRequestConfig;
   if (!config) return Promise.reject(error);
@@ -100,15 +110,7 @@ const errorHandler = async (error: AxiosError) => {
   }
 
   return Promise.reject(error);
-}
-
-// 请求拦截器
-instance.interceptors.request.use((config) => {
-  if (keycloak.token) {
-    config.headers.Authorization = `Bearer ${keycloak.token}`;
-  }
-  return config;
-});
+};
 
 // 响应拦截器
 instance.interceptors.response.use(successHandler, errorHandler);
