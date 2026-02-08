@@ -2,8 +2,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useRef,
+  useEffect,
   useState,
   type ReactNode,
 } from 'react';
@@ -27,8 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setInitialized] = useState(false);
   const [user, setUser] = useState<KeycloakUser | null>(null);
   const [token, setToken] = useState<string | undefined>();
-  const [showLoader, setShowLoader] = useState(true); // 控制 loader 的显示/隐藏
-  const exitLoaderRef = useRef<(() => void) | null>(null); // 保存 loader 的退出动画函数
+  const [showLoader, setShowLoader] = useState(true);
+  const exitLoaderRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     keycloak.onAuthSuccess = () => {
@@ -53,8 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .init({
         onLoad: 'check-sso',
         silentCheckSsoRedirectUri: `${location.origin}/silent-check-sso.html`,
-        pkceMethod: 'S256',
-        checkLoginIframe: false,
+        pkceMethod: 'S256'
       })
       .then((authenticated) => {
         if (authenticated && keycloak.token) {
@@ -85,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setShowLoader(false);
         }
       });
-  }, []);
+  }, [])
 
   // 当 Loader 的消失动画真正完成后，才设置 isInitialized
   const handleLoaderExitComplete = useCallback(() => {
